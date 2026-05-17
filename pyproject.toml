@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "intersection-sim"
+version = "0.1.0"
+description = "Akilli kavsak trafik isigi simulasyonu (SimPy)"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "Nihal Kemer" },
+]
+dependencies = [
+    "simpy>=4.1",
+    "pydantic>=2.0",
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "matplotlib>=3.7",
+    "streamlit>=1.30",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "mypy>=1.5",
+    "ruff>=0.1",
+    "pandas-stubs",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.mypy]
+strict = true
+python_version = "3.9"
+mypy_path = "src"
+packages = ["intersection_sim"]
+
+[[tool.mypy.overrides]]
+module = ["simpy.*", "pandas", "pandas.*", "matplotlib.*"]
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF"]
+# Turkce metin icinde RUF001-003 (ambiguous unicode) false positive uretir
+ignore = ["E501", "RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+# Pydantic v2 + Python 3.9 runtime tip degerlendirmesi Optional[X] gerektirir
+"src/intersection_sim/domain/vehicle.py" = ["UP007", "UP045"]
+"src/intersection_sim/domain/config.py" = ["UP007", "UP045"]
