@@ -55,7 +55,7 @@ FOOTER_Y = 7.25
 PAGE_NUM_X = 12.65
 PAGE_NUM_Y = 0.55
 N_SLIDES = 10
-FOOTER_TEXT = "Nihal Kemer · Akıllı Kavşak Simülasyonu · 2026"
+FOOTER_TEXT = "N. Kemer · M. F. Güneş · Akıllı Kavşak Simülasyonu · 2026"
 
 
 # ---------- Yardimcilar ----------------------------------------------------
@@ -255,10 +255,12 @@ def slide_01_cover(pdf: PdfPages) -> None:
     ax.text(0.9, 6.05, "Bilişim Sistemleri ve Teknolojileri Bölümü",
             fontsize=10.5, color=NEUTRAL, va="center")
 
-    ax.text(0.9, 6.45, "Nihal Kemer · 22430070004",
-            fontsize=12, color=BODY, va="center")
-    ax.text(0.9, 6.75, "Benzetim Programları · Final Projesi · 2026",
-            fontsize=11, color=NEUTRAL, va="center")
+    ax.text(0.9, 6.4, "Nihal Kemer · 22430070004",
+            fontsize=11.5, color=BODY, va="center")
+    ax.text(0.9, 6.65, "Mehmet Furkan Güneş · 22430070005",
+            fontsize=11.5, color=BODY, va="center")
+    ax.text(0.9, 6.95, "Benzetim Programları · Final Projesi · 2026",
+            fontsize=10.5, color=NEUTRAL, va="center")
 
     # Sağ: kavşak ikonu
     _intersection_icon(ax, cx=10.5, cy=4.0, size=2.2)

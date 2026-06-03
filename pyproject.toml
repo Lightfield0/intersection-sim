@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 authors = [
     { name = "Nihal Kemer" },
+    { name = "Mehmet Furkan Güneş" },
 ]
 dependencies = [
     "simpy>=4.1",

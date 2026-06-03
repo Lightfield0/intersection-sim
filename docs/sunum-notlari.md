@@ -1,6 +1,7 @@
 # Sunum Notlari — Akıllı Kavşak Trafik Işığı Simülasyonu
 
-**Sunan:** Nihal Kemer · **Toplam süre:** ~13 dakika · **Slayt sayısı:** 10
+**Hazırlayanlar:** Nihal Kemer · Mehmet Furkan Güneş
+**Toplam süre:** ~13 dakika · **Slayt sayısı:** 10
 · **Demo:** Slayt 10'da (1.5–2 dakika)
 
 Bu notlar PDF'te gorunmuyor. Sunum sırasında telefonundan veya ikinci
@@ -14,7 +15,7 @@ sorular ve cevaplari** var. Akıcı okumak için paragraf biçimi kullanildi —
 ## Slayt 1 — Kapak (30 sn)
 
 ### Konusma metni
-"Merhaba, ben Nihal Kemer. Bugun size finalde sunmak uzere hazirlanan
+"Merhaba, biz Nihal Kemer ve Mehmet Furkan Güneş. Bugün size finalde sunmak üzere hazırladığımız
 **Akıllı Kavşak Trafik Işığı Simülasyonu** projesini anlatacağım. Sağdaki
 şema 4 yollu bir kavsagi temsil ediyor — yeşil daire o an aktif yeşil ışığı,
 kirmiziler ise diger üç yondeki bekleyenleri gösteriyor.

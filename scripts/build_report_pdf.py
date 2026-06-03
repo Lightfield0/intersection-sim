@@ -128,7 +128,7 @@ def _on_page(canvas, doc) -> None:
     canvas.setFillColor(colors.HexColor("#6B7280"))
     canvas.drawString(
         2 * cm, 1.2 * cm,
-        "Nihal Kemer · Akıllı Kavşak Trafik Işığı Simülasyonu · 2026",
+        "N. Kemer · M. F. Güneş · Akıllı Kavşak Trafik Işığı Simülasyonu · 2026",
     )
     canvas.drawRightString(A4[0] - 2 * cm, 1.2 * cm, f"Sayfa {doc.page}")
     canvas.restoreState()
@@ -219,12 +219,15 @@ def section_cover() -> list:
     flow.append(Paragraph("Benzetim Programları", STYLE_COVER_INFO))
     flow.append(Paragraph("Final Projesi · 2026", STYLE_COVER_INFO))
 
-    flow.append(Spacer(1, 1.2 * cm))
-    flow.append(Paragraph("Hazırlayan", STYLE_COVER_INFO))
-    flow.append(Paragraph("Nihal Kemer", STYLE_COVER_NAME))
-    flow.append(Paragraph("22430070004", STYLE_COVER_INFO))
+    flow.append(Spacer(1, 1.0 * cm))
+    flow.append(Paragraph("Hazırlayanlar", STYLE_COVER_INFO))
+    flow.append(Spacer(1, 0.15 * cm))
+    flow.append(Paragraph("Nihal Kemer · 22430070004", STYLE_COVER_NAME))
+    flow.append(Paragraph(
+        "Mehmet Furkan Güneş · 22430070005", STYLE_COVER_NAME,
+    ))
 
-    flow.append(Spacer(1, 0.7 * cm))
+    flow.append(Spacer(1, 0.6 * cm))
     flow.append(Paragraph("Danışman", STYLE_COVER_INFO))
     flow.append(Paragraph("Hüseyin Yanık", STYLE_COVER_NAME))
 
@@ -1136,7 +1139,7 @@ def build() -> Path:
         leftMargin=2 * cm,
         rightMargin=2 * cm,
         title="Akıllı Kavşak Trafik Işığı Simülasyonu - Final Raporu",
-        author="Nihal Kemer",
+        author="Nihal Kemer, Mehmet Furkan Güneş",
         subject="Benzetim Programları Final Projesi 2026",
     )
 
