@@ -1,58 +1,60 @@
-# Intersection Sim — Akilli Kavsak Trafik Isigi Simulasyonu
+# Intersection Sim — Akıllı Kavşak Trafik Işığı Simülasyonu
 
-SimPy ile dort yollu bir kavsagi, **uc farkli trafik isigi kontrolcusu**
-ile kosturup karsilastirir: sabit zamanli, adaptif (kuyruk uzunluguna
-gore yesil suresi) ve acil oncelikli (ambulans gorulurse mevcut yesili
-kapatip acil yone oncelik).
+SimPy ile dört yollu bir kavsagi, **dört farkli trafik ışığı kontrolcüsü**
+ile koşturup karsilastirir: sabit zamanlı, adaptif (kuyruk uzunluğuna
+göre yeşil süresi), **tahmine dayalı** (son 60 sn trendinden 30 sn
+sonrası için tahmin) ve acil öncelikli (ambulans gorulurse mevcut yesili
+kapatip acil yöne öncelik).
 
 > **Sunum hikayesi**
 >
 > Sabit kontrolde **ambulans 40 saniye bekliyor**. Adaptif kontrol bunu
-> **7 saniyeye** dusurdu. Acil oncelikli kontrol **6 saniyeye** —
-> sabit zamanliya gore **yedi kat fark**. Ayni kavsak, uc farkli mantik,
-> dogru karari sezgi degil simulasyon verisi gosterdi.
-
-## Cita: Otobus Duragi vs Bu Proje
-
-| Ozellik | Otobus Duragi (referans) | Bu Proje (kavsak) |
-|---|---|---|
-| Oncelik seviyesi | 2 | 4 yon + acil arac |
-| Asama | Tek (kuyruk → otobus) | Cok (kuyruk → sinyal → cikis) |
-| Kaynak | 1 otobus | 4 yon sinyali + kontrolcu |
-| Mekansal model | Yok | Var (N / S / E / W) |
-| Preemption | Yok | Var (acil arac preempt) |
-| Kontrol stratejisi | Tek | 3 (sabit / adaptif / preemptive) |
-| Senaryo | Tek | 3 kontrolcu × 5 seed |
-| Gorselleştirme | Statik | Streamlit dashboard + kavsak diyagrami |
+> **7 saniyeye** düşürdü. Acil öncelikli kontrol **6 saniyeye** —
+> sabit zamanliya göre **yedi kat fark**. Ayni kavşak, dört farkli mantık,
+> doğru kararı sezgi degil simülasyon verisi gösterdi.
+>
+> **Final genişletmesi:** 4. kontrolcü (hibrit trend-aware tahminci) +
+> 4 yeni metrik ailesi (percentile p50/p75/p90/p95/p99, Jain's fairness,
+> CO2 / yakıt proxy, saatlik heatmap) eklendi. Sabit fair görünüyor
+> (F=0.996) ama herkesi eşit ölçüde bekletmenin **4 katı CO2** maliyeti
+> var. **Hibrit predictive: aynı ortalama, p95 −%9, acil −%5, fairness
+> +%4.5** — trend bonusu ortalamayı kaybettirmeden adalet iyileşiyor.
 
 ## Ozellikler
 
-- **4 yonlu kavsak modeli** (Kuzey / Guney / Dogu / Bati) ayri kuyruklarla
-- **3 kontrolcu** — sabit zamanli (sirayla yesil), adaptif (queue × 3 sn),
-  acil oncelikli (preemption + adaptif)
-- **Saatlik degisken trafik** (Poisson, 07-09 + 17-19 yogun saatler)
-- **Acil arac modeli** (%5 olasilik, ozel KPI)
-- **Coklu seed runner** — istatistiksel guven icin
-- **Streamlit dashboard** — 3 sekme, etkilesimli kavsak gorseli
-- **55 birim test** — mypy strict, ruff temiz
+- **4 yonlu kavşak modeli** (Kuzey / Güney / Doğu / Batı) ayrı kuyruklarla
+- **4 kontrolcü** — sabit zamanlı, adaptif (queue × 3 sn), **tahmine
+  dayalı** (EWMA trend + 30 sn forecast), acil öncelikli (preemption)
+- **Saatlik değişken trafik** (Poisson, 07-09 + 17-19 yoğun saatler)
+- **Acil araç modeli** (%5 olasılık, özel KPI)
+- **Genişletilmiş metrikler** — percentile (p50-p99), Jain's fairness
+  index, CO2 / yakıt proxy, saatlik heatmap, max kuyruk per yön
+- **Coklu seed runner** — istatistiksel guven için
+- **Streamlit dashboard** — 7 sekme (KPI / karşılaştırma / dağılım /
+  saatlik heatmap / burst / sensitivity α sweep / kavşak görseli)
+- **Burst senaryosu** — ani Kuzey'e yığın talep; sabit kontrol 67×
+  catastrophic fail eder, predictive trend avantajı görünür
+- **İstatistiksel anlamlılık** — Mann-Whitney U non-parametrik testi:
+  p95 (p=0.013 *), fairness (p=0.0018 **)
+- **92 birim test** — mypy strict, ruff temiz, Mann-Whitney U istatistiksel anlamlılık
 
 ## Mimari
 
 ```
-                    +----- Kuzey kuyrugu -----+
+                    +----- Kuzey kuyruğu -----+
                     |                          |
                     |   simpy.Store (FIFO)     |
                     |                          |
-                    +----- (4 yon icin ayri) --+
+                    +----- (4 yön için ayrı) --+
                               |
                               v
                      +---- KAVSAK ----+
                      | 4 sinyal      |       Sabit / Adaptif /
-                     | (LightState)  | <---- Acil Oncelikli kontrolcu
-                     +---- 1 cevrim -+        (controllers/*.py)
+                     | (LightState)  | <---- Acil Öncelikli kontrolcü
+                     +---- 1 çevrim -+        (controllers/*.py)
                               |
                               v
-                     +---- Cikis ----+
+                     +---- Çıkış ----+
                      |  Throughput   |   Metrik logger
                      |  KPI'lara yaz |  (metrics/metrics_collector.py)
                      +---------------+
@@ -68,9 +70,9 @@ pip install simpy pydantic pandas numpy matplotlib streamlit pytest mypy ruff
 pip install pandas-stubs   # mypy tip stub'lari
 ```
 
-Python 3.9+ ile calisir.
+Python 3.9+ ile çalışır.
 
-## Calistirma
+## Çalıştırma
 
 ```bash
 # Birim testler
@@ -80,113 +82,194 @@ pytest
 ruff check .
 mypy
 
-# Tek kontrolcu kosumu (CSV + JSON cikti)
+# Tek kontrolcü kosumu (CSV + JSON çıktı)
 python -m intersection_sim.run --controller adaptive --seed 42 --duration-hours 4
 
-# 3 kontrolcu × 5 seed karsilastirma (CSV + 4 PNG)
+# 4 kontrolcü × 5 seed karşılaştırma (CSV + 4 PNG)
 python -m intersection_sim.scenarios.compare --seeds 5 --duration-hours 4
 
-# Etkilesimli Streamlit dashboard
+# BURST senaryosu — ani yön talebi altında 4 kontrolcü
+python -m intersection_sim.scenarios.burst --seeds 5 --duration-hours 4
+
+# Etkileşimli Streamlit dashboard (7 sekme)
 streamlit run dashboard.py
 ```
 
-## Dashboard — 3 sekme
+## Dashboard — 5 sekme
 
-`streamlit run dashboard.py` ile baslar. 3 sekme:
+`streamlit run dashboard.py` ile başlar. 5 sekme:
 
-1. **📊 Senaryo Calistir** — sidebar'dan kontrolcu/sure/seed sec, **Calistir**.
-   Ana panelde 4 KPI metric karti (ortalama bekleme, acil bekleme,
-   throughput, preemption sayisi), kuyruk uzunlugu zaman serisi, yon
-   bazli ortalama bekleme bar chart, arac tipi pie chart.
+1. **Senaryo Çalıştır** — sidebar'dan kontrolcü/süre/seed seç,
+   **Çalıştır**. Ana panelde 8 KPI metric karti (2 satır × 4): ortalama
+   bekleme, acil bekleme, throughput, preemption + **p95 bekleme,
+   Fairness (Jain), CO2 tahmini, toplam idle**. Altta: kuyruk uzunluğu
+   zaman serisi, yön bazlı ortalama bekleme bar chart, araç tipi pie.
 
-2. **📈 3 Kontrolcu Karsilastirma** — `results/comparison.csv` tablosu,
-   3 Faz 4 PNG'si (avg_wait, **emergency_wait — altin grafigimiz**,
-   throughput), `docs/scenario-findings.md` markdown.
+2. **4 Kontrolcü Karşılaştırma** — `results/comparison.csv` tablosu,
+   Faz Final ile genişletildi (p95, Fairness, CO2 kolonları). 4 PNG
+   altta: avg_wait, **emergency_wait — altin grafigimiz**, throughput,
+   wait distribution.
 
-3. **🚦 Kavsak Gorseli** — yukaridan goren statik matplotlib diyagrami.
-   Snapshot zaman slider'i ile zamanin herhangi bir aninda kavsagin
-   durumu (yesil yon + her yondeki kuyruk uzunlugu).
+3. **Dağılım & Çevresel** — Bekleme süresi percentile tablosu (overall
+   / normal / emergency), histogram + boxplot, CO2 / yakıt / idle dakika
+   blokları + "kaç km'ye eşdeğer" karşılığı.
+
+4. **Saatlik Heatmap** — Yön × Saat ortalama bekleme matrisi
+   (YlOrRd colormap, hücre içi değer), saatlik throughput bar grafik.
+   Yoğun saat (07-09 / 17-19) trendi açıkça görünür.
+
+5. **Burst Senaryosu** — comparison_burst.csv tablosu + log-skala bar
+   chart. Sabit kontrolün catastrophic fail ettiği (67× kötü), hibrit
+   predictive'in trend avantajını gösteren senaryo.
+
+6. **Sensitivity α Sweep** — Hibrit predictive'in α parametre süpürmesi.
+   Adaptive baseline + predictive α∈{0..1} taraması, 3 mini-grafik
+   (mean / p95 / fairness vs α). Parametre seçimi şeffaf.
+
+7. **Kavşak Görseli** — yukaridan goren statik matplotlib diyagrami.
+   Snapshot zaman slider'ı ile zamanın herhangi bir anında kavşağın
+   durumu (yeşil yön + her yöndeki kuyruk uzunluğu).
 
 ## KPI tanimlari
 
 | KPI | Anlam |
 |---|---|
-| `mean_wait_time_s` | Variştan gecise baslayana kadar gecen sure (sn) |
-| `mean_wait_by_type["emergency"]` | Sadece acil araclar icin ortalama bekleme |
-| `throughput_per_hour` | Saatte kavsagi gecen arac sayisi |
-| `full_cycle_count` | 4 yesil faz = 1 tam cevrim sayaci |
-| `preemption_count` | Acil arac preempt'i kac kez tetiklendi |
-| `mean_queue_length` | Snapshot ortalamasi (10 sn araliklarla) |
+| `mean_wait_time_s` | Variştan gecise baslayana kadar gecen süre (sn) |
+| `wait_percentiles_s["p95"]` | En kötü %5'lik dilimin bekleme süresi |
+| `mean_wait_by_type["emergency"]` | Sadece acil araçlar için ortalama bekleme |
+| `throughput_per_hour` | Saatte kavsagi gecen araç sayısı |
+| `full_cycle_count` | 4 yeşil faz = 1 tam çevrim sayaci |
+| `preemption_count` | Acil araç preempt'i kac kez tetiklendi |
+| `mean_queue_length` | Snapshot ortalaması (10 sn araliklarla) |
+| `fairness_index` | Jain's index — yönler arası eşit dağılım (1.0 mükemmel) |
+| `co2_grams_proxy` | Idle motor CO2 emisyon proxy (gram) |
+| `fuel_liters_proxy` | Idle motor yakıt tahmini (litre) |
+| `total_idle_seconds` | Tüm araçların kumulatif bekleme süresi |
+| `hourly_throughput[h]` | Saat h'de geçen araç sayısı |
+| `hourly_mean_wait_by_direction_s[d][h]` | Saat h, yön d ortalama bekleme |
 
-## 3 Kontrolcu Karsilastirma (5 seed × 4 saat)
+## 4 Kontrolcü Karşılaştırma (5 seed × 4 saat)
 
-| Kontrolcu | Ort. bekleme | Normal | **Acil** | Throughput | Preempt |
-|---|---:|---:|---:|---:|---:|
-| Sabit Zamanli | 43.7 sn | 43.9 sn | 40.4 sn | 85.2/sa | 0 |
-| Adaptif | 9.7 sn | 9.8 sn | 7.2 sn | 85.2/sa | 0 |
-| **Acil Oncelikli** | 10.1 sn | 10.3 sn | **5.8 sn** | 85.3/sa | 7.0 |
+| Kontrolcü | Ort. | **p95** | Acil | Throughput | **Fairness** | **CO2 (g)** |
+|---|---:|---:|---:|---:|---:|---:|
+| Sabit Zamanlı | 43.72 sn | 101.52 sn | 40.43 sn | 85.2/sa | 0.996 | 5737 |
+| Adaptif | 9.70 sn | 29.24 sn | 7.20 sn | 85.2/sa | 0.852 | 1271 |
+| **Tahmine Dayalı (hibrit)** | 9.71 sn | **26.51 sn** ↓ | **6.83 sn** ↓ | 85.2/sa | **0.891** ↑ | 1273 |
+| Acil Öncelikli | 10.11 sn | 29.91 sn | **5.78 sn** | 85.3/sa | 0.864 | 1328 |
 
 **Kontroller arası farklar:**
-- Sabit → Adaptif ortalama bekleme: **%77.8 dusus** (43.7 → 9.7)
-- Adaptif → Acil Oncelikli acil bekleme: **%19.7 dusus** (7.2 → 5.8)
-- Sabit → Acil Oncelikli acil bekleme: **%85.7 dusus** (40.4 → 5.8)
-- Throughput uc kontrolcuyle de **~85/sa** (kontrolcuden bagimsiz)
+- Sabit → Adaptif ortalama bekleme: **%77.8 düşüş** (43.7 → 9.7)
+- Sabit → Adaptif CO2: **%78 düşüş** (5737 g → 1271 g)
+- Sabit → Acil Öncelikli acil bekleme: **%85.7 düşüş** (40.4 → 5.8)
+- Throughput dört kontrolcüyle de **~85/sa** (kontrolcüden bağımsız)
+- **Fairness paradoksu:** Sabit yüksek fairness (0.996) ama herkesi
+  eşit ölçüde **kötü** bekletiyor — F=1 mutlaka "iyi" değil.
+- **Hibrit predictive (4. kontrolcü) — bonus bulgu:** ortalama bekleme
+  adaptif ile **eşdeğer** (9.71 vs 9.70, gürültü içinde) ama p95 kötü uç
+  **%9.3 düştü** (29.2 → 26.5 sn), acil bekleme **%5 düştü** (7.2 → 6.8),
+  **fairness +%4.5** (0.852 → 0.891). Trend bonusu ortalamayı kaybettirmeden
+  adalet ve kötü uçta net iyileşme sağlıyor.
 
 Detayli yorumlar: [docs/scenario-findings.md](docs/scenario-findings.md).
-Hocanin olasi sorulari: [docs/faq.md](docs/faq.md).
+Hocanın olası sorulari: [docs/faq.md](docs/faq.md).
 Sunum konusma notlari: [docs/sunum-notlari.md](docs/sunum-notlari.md).
 Sunum PDF: [docs/presentation.pdf](docs/presentation.pdf) (10 slayt).
 
 ## Ekran Goruntuleri
 
-- [01 KPI Ozeti](results/screenshots/01_kpi_summary.png) — Adaptif senaryo
-- [02 Karsilastirma](results/screenshots/02_comparison.png) — 3 kontrolcu
-- [03 Kavsak Gorseli](results/screenshots/03_intersection_view.png) — diyagram
-- [04 Acil Bekleme Grafigi](results/screenshots/04_emergency_grafik.png) — altin
+- [01 KPI Ozeti](results/screenshots/01_kpi_summary.png) — 8 KPI kart + grafikler
+- [02 Karşılaştırma](results/screenshots/02_comparison.png) — 4 kontrolcü
+- [03 Dağılım & Çevresel](results/screenshots/03_distribution.png) — percentile + histogram + CO2
+- [04 Saatlik Heatmap](results/screenshots/04_heatmap.png) — yön × saat matrix
+- [05 Kavşak Görseli](results/screenshots/05_intersection_view.png) — diyagram
 
 ## Test ve QA
 
-- **55 birim/entegrasyon testi** — pytest ile kosar
-- **mypy --strict temiz** — 25 src dosya
+- **92 birim/entegrasyon testi** — pytest ile koşar
+- **mypy --strict temiz** — 27 src dosya
 - **ruff temiz**
 - Test gruplari:
-  - **Domain** (test_domain.py, test_arrivals.py): yon enum, Vehicle
-    hesaplari, ArrivalProfile peak/normal, Poisson hizi.
-  - **Sabit kontrolcu** (test_fixed_controller.py): yon sirasi, 136 sn
-    cevrim, sinyal degisim sayaci.
+  - **Domain** (test_domain.py, test_arrivals.py): yön enum, Vehicle
+    hesapları, ArrivalProfile peak/normal, Poisson hızı.
+  - **Sabit kontrolcü** (test_fixed_controller.py): yön sırası, 136 sn
+    çevrim, sinyal değişim sayaci.
   - **Adaptif** (test_adaptive_switching.py, test_adaptive_better_than_fixed.py):
-    longest-queue secimi, min/max yesil siniri, %20 dusus dogrulamasi.
+    longest-queue seçimi, min/max yeşil siniri, %20 düşüş dogrulamasi.
   - **Preemption** (test_preemption_trigger.py, test_emergency_wait_drops.py,
     test_preemption_no_starvation.py): tetikleme dogrulamasi, acil bekleme
-    dusus hipotezi, hicbir yonun ac kalmamasi.
+    düşüş hipotezi, hiçbir yönün ac kalmaması.
   - **Metric** (test_metrics_collector.py): KPI aritmetiği, sentetik veri.
   - **Senaryolar** (test_scenario_runner_reproducibility.py, test_throughput_similar_across.py,
     test_preemptive_better_than_adaptive_emergency.py): reproducibility,
     throughput tutarliligi, ana hipotezler.
   - **Dashboard** (test_dashboard_helpers.py): saf veri katmani.
+  - **Faz Final** (test_metrics_final.py, test_predictive_controller.py):
+    percentile correctness (overall + per-type), Jain's fairness sınırları
+    [0.25, 1.0], CO2 / yakıt formul testi, saatlik bucket sums, predictive
+    trend ekstrapolasyon doğrulaması.
+  - **Faz Final v2** (test_burst_scenario.py, test_statistical_significance.py):
+    BurstEvent yarı-açık zaman penceresi, multi-burst toplama, fixed
+    burst'te catastrophic fail, Mann-Whitney U ile p95 (p=0.013) ve
+    fairness (p=0.0018) anlamlılık testleri.
 
 ## Teknik notlar
 
 ### Polling pattern tercihi
-Kontrolculer her **0.5 sn**'de kuyruga bakar (`yield env.timeout(0.5)`).
-SimPy'nin daha "idiomatic" yontemleri (Store.get + Interrupt) daha
+Kontrolcüler her **0.5 sn**'de kuyruga bakar (`yield env.timeout(0.5)`).
+SimPy'nin daha "idiomatic" yöntemleri (Store.get + Interrupt) daha
 karmaşık ve hata ayiklamasi zor. Polling: bes kelime ile aciklanabilir
-("Her yarim saniyede kuyruga bakar"), debug'i kolay, savunulmasi kolay.
+("Her yarım saniyede kuyruga bakar"), debug'i kolay, savunulmasi kolay.
 
-### Adaptif yesil suresi formulu
+### Adaptif yeşil süresi formulu
 ```python
 green = clamp(queue_length * 3, min_green, max_green)
 # default: min=15, max=60
 ```
-Her arac icin 3 sn (gecis 2 sn + tepki 1 sn). Min 15 ki cok kisa cevrim
-olmasin, max 60 ki bir yon digerleri ac birakmasin.
+Her araç için 3 sn (gecis 2 sn + tepki 1 sn). Min 15 ki çok kısa çevrim
+olmasin, max 60 ki bir yön digerleri ac birakmasin.
 
 ### Preemption mekanizmasi
-1. Yesil sirasinda her tick'te (0.5 sn) kuyrukları tara
-2. Baska bir yonde acil arac bekleyen var mi?
-3. Varsa mevcut yesili **5 sn'ye** sikistir → sari + buffer → acil yone
-   **15 sn sabit yesil**
+1. Yeşil sırasında her tick'te (0.5 sn) kuyrukları tara
+2. Başka bir yönde acil araç bekleyen var mi?
+3. Varsa mevcut yesili **5 sn'ye** sıkıştır → sarı + buffer → acil yöne
+   **15 sn sabit yeşil**
 4. Sonra normal adaptif moda don
+
+### Tahmine Dayalı (Predictive) controller — hibrit final genişletmesi
+Adaptifin trend-aware varyantı. **Saf trend** mantığı (eski tasarım)
+adaptive'i her seed'de geride bırakıyordu (16 parametre kombinasyonu
+sweep ile doğrulandı) çünkü anlık kuyruğu görmezden geliyordu. Doğru
+çözüm: **hibrit score**.
+
+Algoritma:
+1. Son K=6 snapshot'taki (60 sn) kuyruk uzunlukları okunur
+2. Lineer regresyon ile slope hesaplanır; `predicted = current + slope × 30 sn`
+3. **Hibrit skor:** `score(d) = current(d) + α × max(0, predicted(d) − current(d))`
+   - `α = 0.3` (sweep ile seçildi)
+   - Trend yokken score = current → adaptive ile eşdeğer
+   - Trend artıyorsa bonus (max(0,...) ile azalan trend cezası yok)
+4. En yüksek skora sahip yöne yeşil, süre = `clamp(score × 3, 15, 60)`
+
+Sonuç: ortalama bekleme adaptive ile eşdeğer (9.71 vs 9.70 sn, gürültü
+içinde), AMA p95 −%9, acil −%5, fairness +%4.5 — trend bonusu ortalamayı
+kaybettirmeden kötü uç ve adaleti iyileştiriyor.
+
+### Çevresel proxy formülü
+```python
+total_idle = sum(v.wait_time for v in served)   # toplam motor-açık bekleme (sn)
+fuel_L     = total_idle * 0.000167               # 0.6 L/saat idle (EPA literatür)
+co2_g      = fuel_L * 2310                       # 2.31 kg CO2 / L benzin (EPA)
+```
+Bu **gerçek ölçüm değil** — kontrolcüler arası göreceli karşılaştırma için
+literatür sabitleriyle proxy. "Sabit kontrol 4× CO2 üretir" demek için yeterli.
+
+### Jain's fairness index
+```python
+F = (Σ x_i)² / (n × Σ x_i²)    # x_i = yön i'nin ortalama beklemesi
+```
+F=1 → tüm yönler eşit bekliyor (mükemmel adil); F=1/n → tek yön avantajlı.
+Sabit kontrolcü F=0.996 (çok adil ama hepsini eşit ölçüde **kötü** bekletir),
+adaptif/predictive ~0.85 (performans için biraz adaleti feda eder).
 
 ## Proje yapisi
 
@@ -196,31 +279,31 @@ intersection-sim/
 ├── pyproject.toml
 ├── README.md
 ├── docs/
-│   ├── presentation.pdf            # 10 slayt sunum
-│   ├── sunum-notlari.md            # Nihal icin tam konusma metni
-│   ├── faq.md                      # 15 soru + cevap
+│   ├── presentation.pdf            # 9 slayt sunum
+│   ├── sunum-notlari.md            # Nihal için tam konusma metni
+│   ├── faq.md                      # soru + cevap
 │   └── scenario-findings.md
 ├── results/
 │   ├── *.csv                       # per-vehicle, snapshots, comparison
-│   ├── *.json                      # KPI raporlari
-│   ├── comparison_*.png            # 3 karsilastirma grafigi
+│   ├── *.json                      # KPI raporları
+│   ├── comparison_*.png            # 4 karşılaştırma grafigi
 │   ├── wait_time_distribution.png  # bonus histogram
-│   └── screenshots/                # 4 dashboard PNG (Playwright)
+│   └── screenshots/                # 5 dashboard PNG (Playwright)
 ├── scripts/
 │   ├── capture_screenshots.py      # Playwright driver
 │   └── build_presentation_pdf.py   # matplotlib PDF builder
 ├── src/intersection_sim/
 │   ├── domain/                     # Direction, Vehicle, SignalConfig, SimConfig
-│   ├── controllers/                # fixed, adaptive, preemptive
+│   ├── controllers/                # fixed, adaptive, predictive, preemptive
 │   ├── simulation/                 # Intersection, arrivals, crossing, runner
-│   ├── metrics/                    # MetricsCollector + Report
-│   ├── scenarios/                  # 3 senaryo + runner + compare CLI
-│   ├── plots/                      # matplotlib karsilastirma grafikleri
-│   ├── dashboard_helpers.py        # Streamlit-bagimsiz veri katmani
+│   ├── metrics/                    # MetricsCollector + Report (percentile/fairness/CO2)
+│   ├── scenarios/                  # 4 senaryo + runner + compare CLI
+│   ├── plots/                      # matplotlib karşılaştırma grafikleri
+│   ├── dashboard_helpers.py        # Streamlit-bağımsız veri katmani
 │   └── run.py                      # CLI: python -m intersection_sim.run
-└── tests/                          # 55 test
+└── tests/                          # 75 test
 ```
 
 ## Lisans
 
-MIT — okul odevi olarak yazildi, kisisel kullanimda serbest.
+MIT — okul odevi olarak yazıldı, kisisel kullanimda serbest.
