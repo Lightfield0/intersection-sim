@@ -219,19 +219,15 @@ def section_cover() -> list:
     flow.append(Paragraph("Benzetim Programları", STYLE_COVER_INFO))
     flow.append(Paragraph("Final Projesi · 2026", STYLE_COVER_INFO))
 
-    flow.append(Spacer(1, 1.0 * cm))
+    flow.append(Spacer(1, 1.5 * cm))
     flow.append(Paragraph("Hazırlayanlar", STYLE_COVER_INFO))
-    flow.append(Spacer(1, 0.15 * cm))
+    flow.append(Spacer(1, 0.2 * cm))
     flow.append(Paragraph("Nihal Kemer · 22430070004", STYLE_COVER_NAME))
     flow.append(Paragraph(
         "Mehmet Furkan Güneş · 22430070005", STYLE_COVER_NAME,
     ))
 
-    flow.append(Spacer(1, 0.6 * cm))
-    flow.append(Paragraph("Danışman", STYLE_COVER_INFO))
-    flow.append(Paragraph("Hüseyin Yanık", STYLE_COVER_NAME))
-
-    flow.append(Spacer(1, 1.2 * cm))
+    flow.append(Spacer(1, 1.8 * cm))
     flow.append(Paragraph(
         "GitHub: github.com/Lightfield0/intersection-sim",
         _style("repo", fontSize=10, leading=14, alignment=TA_CENTER,
