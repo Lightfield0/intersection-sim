@@ -482,7 +482,7 @@ def section_method() -> list:
 
     flow.append(Paragraph("Tahmine Dayalı Kontrolcü (Hibrit)", STYLE_H3))
     flow.append(Paragraph(
-        "Adaptifin trend-aware varyantı. Son 60 saniyenin (6 snapshot) "
+        "Adaptifin trend-duyarlı varyantı. Son 60 saniyenin (6 snapshot) "
         "kuyruk uzunlukları lineer regresyon ile fit edilir; 30 saniye "
         "sonrası için tahmin yapılır. Hibrit skor:",
         STYLE_BODY_FIRST,
@@ -561,8 +561,9 @@ def section_implementation() -> list:
     flow.append(Paragraph(
         "Predictive kontrolcünün ilk tasarımı <b>saf trend</b> mantığı "
         "üzerine kurulmuştu: hedef yön = argmax(predicted_30s). Bu "
-        "yaklaşım 16 farklı parametre kombinasyonu (lookback K ∈ {2, 3, "
-        "6, 12}, forecast horizon ∈ {5, 10, 30, 60 saniye}) ile sweep "
+        "yaklaşım 16 farklı parametre kombinasyonu (lookback K değerleri "
+        "{2, 3, 6, 12} ve forecast horizon değerleri {5, 10, 30, 60 saniye}) "
+        "ile sweep "
         "edilmiştir. Hiçbir kombinasyon adaptif kontrolü geçemedi; her "
         "seed'de +2.5 ile +3.7 saniye arasında daha kötü ortalama bekleme "
         "üretilmiştir.",
@@ -800,7 +801,7 @@ def section_results() -> list:
         "göre 67 kat daha kötü</b> ortalama bekleme üretmiştir (1139 vs "
         "16.84 saniye). p95 değeri 3122 saniye (yaklaşık 52 dakika) "
         "olmuştur. Bu sonuç, sabit kontrolün talep paterni hızla "
-        "değişen senaryolarda catastrophic fail ettiğini "
+        "değişen senaryolarda ciddi performans çöküşü yaşadığını "
         "kanıtlamaktadır.",
         STYLE_BODY_FIRST,
     ))
@@ -902,8 +903,8 @@ def section_discussion() -> list:
     flow.append(Paragraph(
         "Predictive kontrolün ilk tasarımı, sadece 30 saniye sonrası "
         "için tahmin edilen kuyruk uzunluğuna göre yön seçen saf trend "
-        "mantığıydı. 16 farklı parametre kombinasyonu (lookback K ∈ "
-        "{2, 3, 6, 12} × forecast horizon ∈ {5, 10, 30, 60 saniye}) "
+        "mantığıydı. 16 farklı parametre kombinasyonu (lookback K değerleri "
+        "{2, 3, 6, 12} ile forecast horizon değerleri {5, 10, 30, 60 saniye}) "
         "sweep edilmiş; hiçbiri adaptif kontrolü geçememiştir. Bu, "
         "başarısız olduğu kabul edilmesi ve farklı bir tasarıma "
         "geçilmesi gereken bir negatif bulgudur.",
@@ -982,7 +983,7 @@ def section_conclusion() -> list:
         "Bağlı kavşak ağı modeli (yeşil dalga, network etkileri).",
         "Yaya ve bisikletli modunun eklenmesi.",
         "Sola/sağa dönüş şeritleri ile çoklu şerit modellemesi.",
-        "Reinforcement learning tabanlı kontrolcü — sabit kurallar "
+        "Pekiştirmeli öğrenme tabanlı kontrolcü — sabit kurallar "
         "yerine öğrenen ajan.",
         "Gerçek hastane/şehir trafik verisi ile parametre kalibrasyonu.",
         "Hava koşulları (yağmur, sis) ve gece-gündüz etkilerinin "
