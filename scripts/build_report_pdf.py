@@ -242,44 +242,43 @@ def section_abstract() -> list:
     flow.append(Paragraph("ÖZET", STYLE_H1))
     flow.append(Paragraph(
         "Bu çalışmada, dört yollu bir kavşakta dört farklı trafik ışığı "
-        "kontrol stratejisinin Python tabanlı olay-tabanlı simülasyon "
-        "(SimPy) ile karşılaştırmalı analizi sunulmaktadır. Modellenen "
-        "kontrolcüler: (1) sabit zamanlı, her yöne sırayla 30 saniye "
-        "yeşil veren klasik baseline; (2) adaptif, en uzun kuyruğa sahip "
-        "yöne dinamik yeşil süresi atayan strateji; (3) tahmine dayalı, "
-        "son 60 saniyenin kuyruk trendini lineer regresyon ile hesaplayıp "
-        "30 saniye sonrası için tahmin yapan hibrit yaklaşım; (4) acil "
-        "öncelikli, adaptif mantık üzerine ambulans/itfaiye preemption "
-        "ekleyen kontrolcüdür.",
+        "kontrol yöntemi Python diliyle yazılmış bir benzetim programı "
+        "üzerinde karşılaştırılmıştır. İncelenen yöntemler şunlardır: "
+        "(1) sabit zamanlı yöntem — her yöne sırayla 30 saniye yeşil "
+        "veren klasik anlayış; (2) uyarlanır yöntem — en kalabalık yöne "
+        "daha uzun yeşil veren strateji; (3) tahmine dayalı yöntem — son "
+        "bir dakikanın kuyruk eğilimine bakıp yakın geleceği tahmin eden "
+        "karma yaklaşım; (4) acil öncelikli yöntem — uyarlanır mantığa "
+        "ambulans önceliklendirmesi ekleyen anlayış.",
         STYLE_BODY,
     ))
     flow.append(Paragraph(
-        "5 seed × 4 saatlik tekrarlı koşumlar sonucunda, sabit kontrolün "
-        "ortalama bekleme süresinin 43.7 saniye iken adaptif kontrole "
-        "geçişte %77.8 düşüş ile 9.7 saniyeye indiği gözlemlenmiştir. "
-        "Acil öncelikli kontrol ambulans bekleme süresini 40.4 saniyeden "
-        "5.8 saniyeye düşürmüştür (yedi kat fark). Çevresel etki analizi, "
-        "sabit kontrolün adaptif kontrole kıyasla 4 kat daha fazla idle "
-        "motor CO2 emisyonuna yol açtığını göstermiştir.",
+        "5 tekrar × 4 saatlik koşumların ortalaması alındığında, sabit "
+        "yöntemin ortalama bekleme süresi 43.7 saniye iken uyarlanır "
+        "yönteme geçildiğinde bu süre %77.8 azalarak 9.7 saniyeye "
+        "düşmüştür. Acil öncelikli yöntem ambulans bekleme süresini "
+        "40.4 saniyeden 5.8 saniyeye indirmiştir (yedi kat azalma). "
+        "Çevresel açıdan da sabit yöntem, uyarlanır yönteme göre "
+        "yaklaşık 4 kat daha fazla karbondioksit (CO2) salımına yol "
+        "açmaktadır.",
         STYLE_BODY,
     ))
     flow.append(Paragraph(
-        "Genişletilmiş metrik ailesi kapsamında Jain's fairness index, "
-        "p50-p99 percentile dilimleri, EPA-tabanlı CO2/yakıt proxy ve "
-        "saatlik bekleme heatmap'i hesaplanmıştır. Hibrit predictive "
-        "kontrolcünün adaptif ile ortalama beklemede istatistiksel olarak "
-        "eşdeğer (Mann-Whitney U p=0.97) iken p95 kötü ucu %9 daha düşük "
-        "(p=0.013) ve fairness'ı %4.5 daha yüksek (p=0.0018) verdiği "
-        "kanıtlanmıştır. Ayrıca ani talep yığınlaşması (burst) "
-        "senaryosunda sabit kontrolün adaptif kontrole göre 67 kat daha "
-        "kötü performans verdiği belirlenmiştir.",
+        "Bunlara ek olarak; bekleme süresi dağılım dilimleri "
+        "(%50–%99 aralığı), yön bazlı adalet ölçütü, yakıt ve CO2 "
+        "tahmini ile saatlik bekleme haritası hesaplanmıştır. Tahmine "
+        "dayalı yöntemin ortalama beklemesi uyarlanır yöntemle istatistiksel "
+        "olarak aynı (p=0.97) çıkarken, en kötü %5 dilim %9 daha düşük "
+        "(p=0.013) ve adalet ölçütü %4.5 daha yüksek (p=0.0018) bulunmuştur. "
+        "Ani talep yığılması senaryosunda ise sabit yöntem, uyarlanır "
+        "yönteme göre 67 kat daha kötü sonuç vermiştir.",
         STYLE_BODY,
     ))
     flow.append(Spacer(1, 0.3 * cm))
     flow.append(Paragraph(
-        "<b>Anahtar Kelimeler:</b> Olay tabanlı simülasyon, SimPy, "
-        "trafik ışığı kontrolü, adaptif kontrol, preemption, Jain's "
-        "fairness index, Mann-Whitney U testi, hibrit tahmin.",
+        "<b>Anahtar Kelimeler:</b> trafik ışığı, benzetim, uyarlanır "
+        "kontrol, tahmine dayalı kontrol, acil öncelik, kuyruk teorisi, "
+        "bekleme süresi.",
         STYLE_BODY,
     ))
     flow.append(PageBreak())
@@ -297,23 +296,25 @@ def section_toc() -> list:
         ("&nbsp;&nbsp;&nbsp;&nbsp;1.2. Amaç ve Kapsam", "4"),
         ("&nbsp;&nbsp;&nbsp;&nbsp;1.3. Motivasyon", "4"),
         ("2. YÖNTEM VE TASARIM", "5"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;2.1. Olay Tabanlı Simülasyon Yaklaşımı", "5"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;2.2. Domain Modeli", "5"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;2.3. Dört Kontrolcünün Mantığı", "5"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;2.1. Benzetim Yaklaşımı", "5"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;2.2. Modelin Parçaları", "5"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;2.3. Dört Yöntemin Mantığı", "5"),
         ("3. UYGULAMA DETAYLARI", "7"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;3.1. Mimari ve Polling Pattern", "7"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;3.2. Preemption Mekanizması", "7"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;3.3. Hibrit Predictive Tasarımı", "7"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;3.1. Programın Yapısı", "7"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;3.2. Acil Araç Önceliği Nasıl Çalışır", "7"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;3.3. Tahmine Dayalı Yöntemin Geliştirilmesi", "7"),
         ("4. BULGULAR", "8"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;4.1. Baseline Sonuçları", "8"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;4.2. Dört Kontrolcü Karşılaştırması", "8"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;4.3. Genişletilmiş Metrikler", "10"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;4.4. Burst Senaryosu", "11"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;4.5. İstatistiksel Anlamlılık", "12"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;4.1. Sabit Yöntemin Sonuçları", "8"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;4.2. Dört Yöntemin Karşılaştırılması", "8"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;4.3. Ek Ölçütler", "10"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;4.4. Ani Talep Senaryosu", "11"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;4.5. Sonuçların İstatistiksel Güvenilirliği",
+         "12"),
         ("5. TARTIŞMA", "13"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;5.1. Fairness Paradoksu", "13"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;5.2. Saf Trend Mantığının Başarısızlığı", "13"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;5.3. Çevresel Etki Yorumu", "13"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;5.1. Adalet Yanılgısı", "13"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;5.2. İlk Tasarımın Başarısızlığı ve "
+         "Geliştirilmesi", "13"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;5.3. Çevresel Etkinin Değerlendirilmesi", "13"),
         ("6. SONUÇ VE GELECEK ÇALIŞMALAR", "14"),
         ("KAYNAKÇA", "15"),
         ("EKLER", "16"),
@@ -365,16 +366,16 @@ def section_introduction() -> list:
         STYLE_BODY_FIRST,
     ))
     bullets = [
-        "Sabit zamanlı kontrolün adaptif kontrole göre ne kadar "
-        "performans kaybı getirdiği,",
-        "Acil öncelikli (preemption) kontrolün ambulans bekleme süresine "
-        "etkisi,",
-        "Trend tahmini yapan bir 4. kontrolcünün adaptif kontrole göre "
-        "ek değer sağlayıp sağlamadığı,",
-        "Sabit kontrolün ani talep yığınlaşması (burst) senaryosunda "
-        "nasıl davrandığı,",
-        "Yönler arası adalet (fairness) ve çevresel etki (CO2 emisyonu) "
-        "boyutlarında kontroller arası farklar.",
+        "Sabit zamanlı yöntemin, uyarlanır yönteme göre ne kadar "
+        "performans kaybı yaşattığı,",
+        "Acil araç önceliği uygulayan yöntemin, ambulans bekleme "
+        "süresine etkisi,",
+        "Gelecek talebi tahmin eden dördüncü bir yöntemin, uyarlanır "
+        "yönteme göre ek bir kazanç sağlayıp sağlamadığı,",
+        "Sabit zamanlı yöntemin, ani talep yığılması durumunda nasıl "
+        "davrandığı,",
+        "Dört yön arasındaki adalet ve karbondioksit (CO2) salımı "
+        "açılarından yöntemler arası farklar.",
     ]
     for b in bullets:
         flow.append(Paragraph(f"&bull; {b}", STYLE_BULLET))
@@ -400,111 +401,116 @@ def section_method() -> list:
     flow.append(Paragraph("2. YÖNTEM VE TASARIM", STYLE_H1))
 
     flow.append(Paragraph(
-        "2.1. Olay Tabanlı Simülasyon Yaklaşımı", STYLE_H2,
+        "2.1. Benzetim Yaklaşımı", STYLE_H2,
     ))
     flow.append(Paragraph(
-        "Çalışmada Python 3.9 üzerinde SimPy 4.1 olay tabanlı simülasyon "
-        "kütüphanesi kullanılmıştır. SimPy, process tabanlı bir DES "
-        "framework'üdür: her birim (araç üretici, sinyal kontrolcü, "
-        "kavşak geçişi) bir Python generator olarak modellenir; "
-        "<i>yield env.timeout(s)</i> ifadesi ile simülasyon zamanı "
-        "ilerletilir. Bu yaklaşım gerçek zamanlı olmadığı için 4 "
-        "saatlik bir koşum tipik olarak 1-2 saniye sürer; 5 seed × 4 "
-        "kontrolcü karşılaştırması ise yaklaşık 30 saniyede tamamlanır.",
+        "Çalışma Python diliyle yazılmıştır. Benzetimi yürütmek için "
+        "SimPy adlı bir kütüphane kullanılmıştır. Programın her parçası "
+        "(araç üretici, sinyal denetimi, kavşaktan geçiş) ayrı bir süreç "
+        "olarak çalışır ve benzetim zamanı bu süreçler üzerinden "
+        "ilerletilir. Bu yöntem gerçek zamanda değil, sayısal olarak "
+        "çalıştığı için 4 saatlik bir koşum yaklaşık 1-2 saniyede biter; "
+        "5 tekrar ile dört kontrol yönteminin karşılaştırılması ise "
+        "yaklaşık 30 saniye sürer.",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "Olay tabanlı simülasyon, sürekli zaman dilimleri yerine olay "
-        "noktaları (varış, geçiş başı, yeşil bitişi gibi) üzerinde "
-        "çalıştığı için trafik kavşağı gibi karma yapılarda doğal bir "
-        "modelleme dilidir. Ayrıca Pydantic v2 ile tüm domain modelleri "
-        "tip-güvenli olarak tanımlanmış, çalışma zamanı doğrulaması "
-        "(geliş hızı > 0, percentile 0-100 arası gibi) sağlanmıştır.",
+        "Benzetim her olayı (araç varışı, yeşilin bitmesi, geçişin "
+        "başlaması gibi) ayrı bir nokta olarak işler. Bu, trafik kavşağı "
+        "gibi olayların belli anlarda meydana geldiği sistemleri "
+        "doğal biçimde modellemeyi sağlar. Modeldeki tüm veri yapıları "
+        "için gelen değerlerin doğruluğu çalışma sırasında kontrol "
+        "edilmektedir (örneğin geliş hızı sıfırdan büyük olmalı).",
         STYLE_BODY_FIRST,
     ))
 
-    flow.append(Paragraph("2.2. Domain Modeli", STYLE_H2))
+    flow.append(Paragraph("2.2. Modelin Parçaları", STYLE_H2))
     flow.append(Paragraph("Modelin temel bileşenleri şunlardır:", STYLE_BODY))
     domain_table = _make_table(
         headers=["Bileşen", "Açıklama"],
         rows=[
-            ["Direction", "4 yön enum: Kuzey, Güney, Doğu, Batı"],
-            ["Vehicle", "Pydantic model: id, yön, tip (normal/acil), "
-                       "varış-geçiş zaman damgaları"],
-            ["ArrivalProfile", "Saatlik değişken Poisson hızları "
-                              "(07-09 ve 17-19 yoğun)"],
-            ["BurstEvent", "Belirli zamanda + yönde ek talep yığınlaşması"],
-            ["SignalConfig", "Yeşil/sarı/kırmızı süreleri, min/max sınırlar"],
-            ["MetricsCollector", "Olay damgaları + snapshot toplama"],
-            ["MetricsReport", "Özet KPI'lar: ortalama, percentile, "
-                             "fairness, CO2"],
+            ["Yön", "Dört yön: Kuzey, Güney, Doğu, Batı"],
+            ["Araç", "Numara, geldiği yön, tipi (normal/acil), varış ve "
+                    "geçiş zamanları"],
+            ["Geliş profili", "Saatlik değişen geliş hızları "
+                             "(07-09 ve 17-19 yoğun)"],
+            ["Ani yığın", "Belirli bir anda ve yönde gelen ek talep"],
+            ["Sinyal ayarları", "Yeşil, sarı ve kırmızı süreleri ile alt-üst "
+                              "sınırlar"],
+            ["Veri toplayıcı", "Koşum boyunca olayları ve anlık ölçümleri "
+                              "kaydeder"],
+            ["Sonuç raporu", "Ortalama bekleme, en kötü dilim, adalet, CO2 "
+                            "gibi özet bilgiler"],
         ],
         col_widths=[3.5 * cm, 11 * cm],
     )
     flow.append(domain_table)
     flow.append(Spacer(1, 0.3 * cm))
     flow.append(Paragraph(
-        "Geliş hızları literatür değerlerine yakındır: Kuzey-Güney "
-        "yönleri 0.4 araç/dakika (yoğun saatte 0.7-0.8), Doğu-Batı "
-        "yönleri 0.3 araç/dakika (yoğun saatte 0.6). Acil araç olasılığı "
-        "%5 olarak alınmıştır (literatür aralığı %2-7).",
+        "Geliş hızları literatür değerlerine yakındır. Kuzey ve Güney "
+        "yönlerinde dakikada ortalama 0.4 araç (yoğun saatte 0.7-0.8); "
+        "Doğu ve Batı yönlerinde 0.3 araç (yoğun saatte 0.6) gelmektedir. "
+        "Gelen araçların %5'i acil araçtır (literatürde bu oran %2-7 "
+        "arasında değişmektedir).",
         STYLE_BODY_FIRST,
     ))
 
-    flow.append(Paragraph("2.3. Dört Kontrolcünün Mantığı", STYLE_H2))
+    flow.append(Paragraph("2.3. Dört Yöntemin Mantığı", STYLE_H2))
 
-    flow.append(Paragraph("Sabit Zamanlı Kontrolcü", STYLE_H3))
+    flow.append(Paragraph("Sabit Zamanlı Yöntem", STYLE_H3))
     flow.append(Paragraph(
-        "Klasik baseline. Her yöne sırayla (Kuzey → Doğu → Güney → Batı) "
-        "30 saniye yeşil, 3 saniye sarı, 1 saniye tüm-kırmızı buffer "
-        "verir. Tam bir çevrim 136 saniye sürer ve trafik talebine "
-        "duyarsızdır. Boş yön yeşili kabul ederken yoğun yön sırasını "
-        "bekler.",
+        "Klasik referans yöntem. Her yöne sırayla (Kuzey → Doğu → Güney "
+        "→ Batı) 30 saniye yeşil, 3 saniye sarı, 1 saniye tüm yönlerin "
+        "kırmızı kaldığı güvenlik aralığı verilir. Bir tam tur 136 "
+        "saniye sürer ve trafik yoğunluğuna duyarsızdır. Boş yöne bile "
+        "yeşil verirken, kalabalık yön sırasını beklemek zorundadır.",
         STYLE_BODY_FIRST,
     ))
 
-    flow.append(Paragraph("Adaptif Kontrolcü", STYLE_H3))
+    flow.append(Paragraph("Uyarlanır Yöntem", STYLE_H3))
     flow.append(Paragraph(
-        "Her yeşil periyodu başlamadan önce 4 yönün kuyruğu taranır; "
-        "en uzun kuyruğa sahip yön seçilir. Yeşil süresi şu formülle "
-        "hesaplanır:",
+        "Her yeşil verilmeden önce dört yönün kuyruğuna bakılır ve en "
+        "kalabalık yön seçilir. Yeşil süresi şu kurala göre belirlenir:",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "<b>green = clamp(queue_length × 3 sn, 15, 60)</b>",
+        "yeşil süresi = kuyruktaki araç sayısı × 3 saniye "
+        "(en az 15, en fazla 60 saniye)",
         STYLE_CODE,
     ))
     flow.append(Paragraph(
-        "Min 15 saniye, max 60 saniye sınırları diğer yönlerin "
-        "açlıktan etkilenmemesini garantiler.",
+        "En düşük 15 ve en yüksek 60 saniye sınırları, diğer yönlerin "
+        "uzun süre yeşil bekleyişinde kalmamasını güvence altına alır.",
         STYLE_BODY_FIRST,
     ))
 
-    flow.append(Paragraph("Tahmine Dayalı Kontrolcü (Hibrit)", STYLE_H3))
+    flow.append(Paragraph("Tahmine Dayalı Yöntem", STYLE_H3))
     flow.append(Paragraph(
-        "Adaptifin trend-duyarlı varyantı. Son 60 saniyenin (6 snapshot) "
-        "kuyruk uzunlukları lineer regresyon ile fit edilir; 30 saniye "
-        "sonrası için tahmin yapılır. Hibrit skor:",
+        "Uyarlanır yöntemin geliştirilmiş halidir. Son bir dakikadaki "
+        "kuyruk uzunluklarına bakılarak yakın geleceğin (30 saniye "
+        "sonrası) kuyruk uzunluğu tahmin edilir. Yön seçilirken bu "
+        "tahmin de hesaba katılır:",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "<b>score(d) = current(d) + 0.3 × max(0, predicted(d) − current(d))</b>",
+        "puan = anlık kuyruk + 0.3 × (kuyruktaki artış miktarı)",
         STYLE_CODE,
     ))
     flow.append(Paragraph(
-        "Anlık kuyruk temel alınır; sadece kuyruk artıyorsa trend "
-        "bonusu eklenir, azalıyorsa ceza yapılmaz. α = 0.3 parametre "
-        "sweep'i ile seçilmiştir (detay Bölüm 3.3 ve 5.2'de).",
+        "Anlık kuyruk her zaman temel alınır. Kuyruk artıyorsa ekstra "
+        "puan eklenir; azalıyorsa bir ceza uygulanmaz. Buradaki 0.3 "
+        "katsayısı, çok sayıda denemeyle en iyi sonucu veren değer "
+        "olarak belirlenmiştir.",
         STYLE_BODY_FIRST,
     ))
 
-    flow.append(Paragraph("Acil Öncelikli Kontrolcü", STYLE_H3))
+    flow.append(Paragraph("Acil Öncelikli Yöntem", STYLE_H3))
     flow.append(Paragraph(
-        "Adaptif mantık üzerine preemption katmanı: her tick (0.5 "
-        "saniye) tüm yönlerin kuyruğu kontrol edilir. Acil araç varsa "
-        "mevcut yeşil 5 saniyede kapatılır (sarı + buffer), acil aracın "
-        "yönüne 15 saniye sabit yeşil verilir. Bu pencerede acil araç "
-        "mutlaka geçer.",
+        "Uyarlanır yönteme ek bir kural getirir: her yarım saniyede tüm "
+        "yönlerin kuyruğu denetlenir. Bir acil araç görüldüğünde, mevcut "
+        "yeşil 5 saniye içinde kapatılır (sarı ve güvenlik aralığı "
+        "geçilir) ve acil aracın bulunduğu yöne 15 saniye sabit yeşil "
+        "verilir. Bu süre içinde acil araç mutlaka kavşağı geçer.",
         STYLE_BODY_FIRST,
     ))
     flow.append(PageBreak())
@@ -515,89 +521,85 @@ def section_implementation() -> list:
     flow = []
     flow.append(Paragraph("3. UYGULAMA DETAYLARI", STYLE_H1))
 
-    flow.append(Paragraph("3.1. Mimari ve Polling Pattern", STYLE_H2))
+    flow.append(Paragraph("3.1. Programın Yapısı", STYLE_H2))
     flow.append(Paragraph(
-        "Sistemin omurgası Intersection sınıfı olup, 4 yön için ayrı "
-        "SimPy Store (FIFO kuyruğu) tutar. Geliş süreci her yön için "
-        "ayrı bir SimPy process'i olarak kurgulanmıştır; her process "
-        "ArrivalProfile.rate_for(yön, sim_zaman) çağrılarının sonucundan "
-        "üstel dağılımdan örnekleme yaparak inter-arrival sürelerini "
-        "üretir.",
+        "Sistemin merkezinde bir kavşak sınıfı vardır. Bu sınıf, dört "
+        "yön için ayrı bekleme kuyrukları tutar. Her yön için ayrı bir "
+        "araç üretici çalışır ve bu üreticiler, geliş profilinde "
+        "belirtilen hıza göre yeni araçları kuyruğa ekler. Araç gelişleri "
+        "birbirinden bağımsız olduğu için Poisson dağılımı kullanılmıştır.",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "Kontrolcü generator'ları polling pattern kullanır: her 0.5 "
-        "saniyede bir kuyruk durumu kontrol edilir. SimPy'nin daha "
-        "idiomatic Store.get + Interrupt kombinasyonu yerine polling "
-        "tercih edilmesinin gerekçesi savunulabilirlik: 'her yarım "
-        "saniyede kuyruğa bakar' ifadesi beş kelimede açıklanabilir, "
-        "debug edilebilir ve test edilebilir.",
+        "Yöntemler, kuyrukları her yarım saniyede bir kontrol eder. Bu "
+        "basit yaklaşım, daha karmaşık olay yakalama yöntemlerine göre "
+        "tercih edilmiştir; çünkü hem anlatması kolay (yarım saniyede "
+        "bir kuyruğa bak) hem de hata ayıklaması basittir.",
         STYLE_BODY_FIRST,
     ))
 
-    flow.append(Paragraph("3.2. Preemption Mekanizması", STYLE_H2))
+    flow.append(Paragraph("3.2. Acil Araç Önceliği Nasıl Çalışır", STYLE_H2))
     flow.append(Paragraph(
-        "Acil öncelikli kontrolcü, yeşil aktif sırasında her tick'te "
-        "tüm yönleri tarar. Eğer başka bir yönde acil araç "
-        "(vehicle_type = EMERGENCY) varsa preemption tetiklenir:",
+        "Acil öncelikli yöntem, yeşil aktif olduğu sürece tüm yönleri "
+        "yarım saniyede bir denetler. Başka bir yönde acil araç "
+        "görülürse şu adımlar uygulanır:",
         STYLE_BODY_FIRST,
     ))
     pre_steps = [
-        "Mevcut yeşil 5 saniyede kapatılır (kısa sarı).",
-        "Tüm-kırmızı buffer (1 sn) geçilir.",
+        "Mevcut yeşil 5 saniye içinde kapatılır (kısa süreli sarı).",
+        "1 saniye boyunca tüm yönler kırmızı (güvenlik aralığı).",
         "Acil aracın yönüne 15 saniye sabit yeşil verilir.",
-        "Bu pencerede acil araç mutlaka kavşağı geçer.",
-        "Sonra normal adaptif moda dönülür.",
+        "Bu süre içinde acil araç kavşağı geçer.",
+        "Ardından normal uyarlanır yönteme dönülür.",
     ]
     for s in pre_steps:
         flow.append(Paragraph(f"&bull; {s}", STYLE_BULLET))
     flow.append(Paragraph(
-        "Preemption tetiklenme sayısı (preemption_count) ayrı bir KPI "
-        "olarak raporlanır.",
+        "Bir koşum boyunca bu mekanizmanın kaç kez devreye girdiği "
+        "ayrı bir göstergede tutulmaktadır.",
         STYLE_BODY_FIRST,
     ))
 
-    flow.append(Paragraph("3.3. Hibrit Predictive Tasarımı", STYLE_H2))
+    flow.append(Paragraph("3.3. Tahmine Dayalı Yöntemin Geliştirilmesi", STYLE_H2))
     flow.append(Paragraph(
-        "Predictive kontrolcünün ilk tasarımı <b>saf trend</b> mantığı "
-        "üzerine kurulmuştu: hedef yön = argmax(predicted_30s). Bu "
-        "yaklaşım 16 farklı parametre kombinasyonu (lookback K değerleri "
-        "{2, 3, 6, 12} ve forecast horizon değerleri {5, 10, 30, 60 saniye}) "
-        "ile sweep "
-        "edilmiştir. Hiçbir kombinasyon adaptif kontrolü geçemedi; her "
-        "seed'de +2.5 ile +3.7 saniye arasında daha kötü ortalama bekleme "
-        "üretilmiştir.",
+        "Tahmine dayalı yöntemin ilk tasarımında yalnızca gelecekteki "
+        "kuyruk uzunluğu hesaba katılıyordu. Bu yaklaşım 16 farklı "
+        "parametre denemesinden geçirilmiş, ancak hiçbiri uyarlanır "
+        "yöntemi geçememiştir. Her denemede uyarlanır yönteme göre 2.5 "
+        "ile 3.7 saniye arasında daha kötü sonuç alınmıştır.",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "Sebep: saf trend mantığı anlık kuyruğu görmezden geliyordu. "
-        "Bu negatif bulgu üzerine hibrit tasarıma geçilmiştir:",
+        "Sebep şudur: bu ilk tasarım, kuyruğun şu anki durumunu göz "
+        "ardı edip yalnızca geleceğe bakıyordu. Bu olumsuz sonuç "
+        "üzerine yöntem, hem şu anki kuyruğu hem de gelecekteki artışı "
+        "birlikte değerlendiren karma bir yapıya dönüştürülmüştür:",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "<b>score(d) = current(d) + α × max(0, predicted(d) − current(d))</b><br/>"
-        "α = 0.3 (sweep ile seçildi)",
+        "puan = anlık kuyruk + 0.3 × kuyruktaki artış",
         STYLE_CODE,
     ))
     flow.append(Paragraph(
-        "Anlık kuyruk temel alınır; sadece kuyruk artıyorsa "
-        "(predicted > current) trend bonusu eklenir. Bu sayede:",
+        "Bu sayede:",
         STYLE_BODY_FIRST,
     ))
     hybrid_features = [
-        "Trend yokken (sabit kuyruk): score = current, adaptif ile "
-        "eşdeğer karar.",
-        "Trend artıyorsa: score > current, daha erken/uzun yeşil verilir.",
-        "Trend azalıyorsa: max(0, …) = 0, ceza yapılmaz.",
+        "Kuyruk değişmiyorsa: puan, anlık kuyruğa eşittir ve uyarlanır "
+        "yöntemle aynı karar verilir.",
+        "Kuyruk artıyorsa: puan biraz daha yüksek olur ve o yöne daha "
+        "erken yeşil verilir.",
+        "Kuyruk azalıyorsa: ek bir ceza uygulanmaz; yine anlık kuyruk "
+        "esas alınır.",
     ]
     for f in hybrid_features:
         flow.append(Paragraph(f"&bull; {f}", STYLE_BULLET))
 
     flow.append(Paragraph(
-        "α parametresi {0.0, 0.1, 0.2, …, 2.0} aralığında taratılmıştır. "
-        "[0.1, 1.0] aralığında predictive ortalama bekleme adaptif ile "
-        "± 0.5 saniye gürültü içinde kalmıştır. Sunulan değer α = 0.3 "
-        "bu aralığın orta noktasıdır.",
+        "Buradaki 0.3 sayısı, sıfır ile iki arasında çeşitli değerler "
+        "denenerek belirlenmiştir. 0.1 ile 1.0 arasındaki değerler "
+        "uyarlanır yöntemle çok yakın sonuç vermiş; bu aralığın ortası "
+        "olan 0.3 seçilmiştir.",
         STYLE_BODY_FIRST,
     ))
     flow.append(PageBreak())
@@ -609,8 +611,9 @@ def section_results() -> list:
     flow.append(Paragraph("4. BULGULAR", STYLE_H1))
 
     flow.append(Paragraph(
-        "Tüm sonuçlar 5 seed × 4 saatlik koşumların ortalaması olarak "
-        "raporlanmıştır. Reprodüksiyon için:",
+        "Tüm sonuçlar 5 farklı tekrarın ortalaması olarak verilmiştir; "
+        "her tekrar 4 saatlik bir koşumdur. Aynı sonuçları üretmek için "
+        "aşağıdaki komut kullanılabilir:",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
@@ -618,7 +621,7 @@ def section_results() -> list:
         STYLE_CODE,
     ))
 
-    flow.append(Paragraph("4.1. Baseline Sonuçları", STYLE_H2))
+    flow.append(Paragraph("4.1. Sabit Yöntemin Sonuçları", STYLE_H2))
     flow.append(Paragraph(
         "Sabit zamanlı kontrolün 4 saatlik sonuçları şunlardır:",
         STYLE_BODY,
@@ -629,163 +632,168 @@ def section_results() -> list:
             ["Ortalama bekleme", "43.72 sn"],
             ["p95 bekleme", "101.52 sn"],
             ["Acil araç bekleme", "40.43 sn"],
-            ["Throughput", "85.2 araç/saat"],
-            ["Fairness index (Jain)", "0.996"],
-            ["CO2 emisyonu proxy", "5737 g"],
-            ["Tam çevrim sayısı", "~106"],
+            ["Saatte geçen araç sayısı", "85.2"],
+            ["Yön adaleti (0–1 arası)", "0.996"],
+            ["Tahmini CO2 salımı", "5737 g"],
+            ["Tam tur sayısı", "yaklaşık 106"],
         ],
         col_widths=[6 * cm, 4 * cm],
     )
     flow.append(baseline_table)
     flow.append(Spacer(1, 0.3 * cm))
     flow.append(Paragraph(
-        "Sabit kontrol her yöne yaklaşık eşit bekleme dağıttığı için "
-        "fairness 0.996'ya çıkmaktadır; ancak ortalama bekleme 43.7 "
-        "saniye ile kabul edilemez seviyededir. Bu durum 'Fairness "
-        "Paradoksu' olarak tartışılmıştır (Bölüm 5.1).",
+        "Sabit yöntem her yöne yaklaşık eşit bekleme dağıttığı için "
+        "adalet ölçütü 0.996 gibi yüksek bir değer almaktadır; fakat "
+        "ortalama bekleme 43.7 saniye gibi kabul edilemez bir "
+        "seviyededir. Bu durum 'adalet yanılgısı' olarak Bölüm 5.1'de "
+        "ele alınmaktadır.",
         STYLE_BODY_FIRST,
     ))
 
-    flow.append(Paragraph("4.2. Dört Kontrolcü Karşılaştırması", STYLE_H2))
+    flow.append(Paragraph("4.2. Dört Yöntemin Karşılaştırılması", STYLE_H2))
     flow.append(Paragraph(
-        "Tablo 4.1 dört kontrolcünün temel KPI'larını özetlemektedir.",
+        "Tablo 4.1 dört yöntemin temel sonuçlarını bir arada "
+        "göstermektedir.",
         STYLE_BODY,
     ))
     comp_table = _make_table(
-        headers=["Kontrolcü", "Ort.", "p95", "Acil",
-                 "Thru.", "Fairness", "CO2 (g)"],
+        headers=["Yöntem", "Ortalama", "En kötü %5", "Acil",
+                 "Saatlik", "Adalet", "CO2 (g)"],
         rows=[
             ["Sabit Zamanlı", "43.72", "101.52", "40.43",
              "85.2", "0.996", "5737"],
-            ["Adaptif", "9.70", "29.24", "7.20", "85.2", "0.852", "1271"],
+            ["Uyarlanır", "9.70", "29.24", "7.20", "85.2", "0.852", "1271"],
             ["Tahmine Dayalı", "9.71", "26.51", "6.83",
              "85.2", "0.891", "1273"],
             ["Acil Öncelikli", "10.11", "29.91", "5.78",
              "85.3", "0.864", "1328"],
         ],
-        col_widths=[3.3 * cm, 1.5 * cm, 1.6 * cm, 1.5 * cm,
-                    1.6 * cm, 1.8 * cm, 1.8 * cm],
+        col_widths=[3.0 * cm, 1.8 * cm, 2.0 * cm, 1.4 * cm,
+                    1.6 * cm, 1.6 * cm, 1.7 * cm],
+        col_align=["LEFT", "CENTER", "CENTER", "CENTER",
+                   "CENTER", "CENTER", "CENTER"],
     )
     flow.append(comp_table)
     flow.append(Paragraph(
-        "Tablo 4.1: 5 seed × 4 saat ortalaması. Bekleme değerleri "
-        "saniye, throughput araç/saat.",
+        "Tablo 4.1: 5 tekrar × 4 saat ortalaması. Bekleme süreleri "
+        "saniye, geçiş ise saatte kavşağı geçen araç sayısıdır.",
         STYLE_CAPTION,
     ))
 
     flow.append(_figure(
         "results/comparison_emergency_wait.png",
         "Şekil 4.1: Acil araç bekleme süresi karşılaştırması. Sabit "
-        "kontrolde 40.4 sn beklemenin adaptif ile 7.2 sn'ye, acil "
-        "öncelikli ile 5.8 sn'ye düştüğü görülmektedir (yedi kat fark).",
+        "yöntemde 40.4 saniye olan bekleme, uyarlanır yöntemde 7.2 "
+        "saniyeye, acil öncelikli yöntemde 5.8 saniyeye düşmektedir "
+        "(yedi kat azalma).",
     ))
 
     flow.append(Paragraph(
-        "Karşılaştırmadan çıkan ana bulgular:",
+        "Karşılaştırmadan çıkan ana sonuçlar:",
         STYLE_BODY,
     ))
     findings = [
-        "Sabit → Adaptif geçişi ortalama beklemeyi %77.8 düşürmüştür "
-        "(43.7 → 9.7 sn).",
-        "Sabit → Acil Öncelikli geçişi acil araç beklemesini %85.7 "
-        "düşürmüştür (40.4 → 5.8 sn) — yedi kat fark.",
-        "Throughput tüm kontrolcülerde ~85 araç/saat seviyesinde kalır; "
-        "çünkü Poisson hızı sabittir ve kontrolcü gelen aracı durduramaz, "
-        "sadece bekleme süresini optimize eder.",
-        "Hibrit predictive ortalama beklemede adaptif ile eşdeğer (9.71 "
-        "vs 9.70 sn) ancak p95'te %9.3 daha iyi (26.51 vs 29.24 sn) ve "
-        "fairness'ta %4.5 daha yüksek (0.891 vs 0.852) sonuç vermiştir.",
+        "Sabit yöntemden uyarlanır yönteme geçildiğinde ortalama "
+        "bekleme %77.8 azalmaktadır (43.7 → 9.7 saniye).",
+        "Sabit yöntemden acil öncelikli yönteme geçildiğinde acil araç "
+        "bekleme süresi %85.7 azalmaktadır (40.4 → 5.8 saniye) — yedi "
+        "kat azalma.",
+        "Saatte geçen araç sayısı tüm yöntemlerde yaklaşık 85'tir; "
+        "çünkü araç gelişleri yöntemden bağımsızdır ve yöntemin görevi "
+        "bekleme süresini kısaltmaktır, gelen aracı durdurmak değil.",
+        "Tahmine dayalı yöntem ortalama beklemede uyarlanır yöntemle "
+        "neredeyse aynı sonucu vermiş (9.71 ile 9.70 saniye), ancak en "
+        "kötü %5 dilimde %9.3 daha iyi (26.51 / 29.24) ve adalet "
+        "ölçütünde %4.5 daha yüksek (0.891 / 0.852) çıkmıştır.",
     ]
     for f in findings:
         flow.append(Paragraph(f"&bull; {f}", STYLE_BULLET))
 
     flow.append(PageBreak())
 
-    flow.append(Paragraph("4.3. Genişletilmiş Metrikler", STYLE_H2))
-    flow.append(Paragraph("Percentile Dilimleri", STYLE_H3))
+    flow.append(Paragraph("4.3. Ek Ölçütler", STYLE_H2))
+    flow.append(Paragraph("Bekleme Süresi Dilimleri", STYLE_H3))
     flow.append(Paragraph(
-        "Ortalama tek başına yanıltıcı bir özet metriktir. Adaptif "
-        "kontrolde:",
+        "Ortalama tek başına yeterli bir ölçü değildir. Uyarlanır "
+        "yöntemde bekleme süreleri dilimlere göre şöyledir:",
         STYLE_BODY,
     ))
     pct_table = _make_table(
-        headers=["Dilim", "Değer (sn)"],
+        headers=["Dilim", "Değer (saniye)"],
         rows=[
-            ["p50 (medyan)", "6.17"],
-            ["p75", "13.88"],
-            ["p90", "18.08"],
-            ["p95", "24.21"],
-            ["p99", "45.74"],
+            ["Ortanca (sürücülerin yarısı altında)", "6.17"],
+            ["%75 dilim", "13.88"],
+            ["%90 dilim", "18.08"],
+            ["%95 dilim (en kötü %5)", "24.21"],
+            ["%99 dilim (en kötü %1)", "45.74"],
         ],
-        col_widths=[4 * cm, 4 * cm],
+        col_widths=[7 * cm, 4 * cm],
     )
     flow.append(pct_table)
     flow.append(Paragraph(
-        "Yarısı 6 saniyede geçmesine rağmen, her 20 sürücüden 1'i 24 "
-        "saniye, her 100'den 1'i 46 saniye beklemektedir. p95 metriğini "
-        "izlemek 'kötü uçtaki' kullanıcı deneyimini görmeyi sağlar.",
+        "Sürücülerin yarısı 6 saniyede geçmesine rağmen, her 20 sürücüden "
+        "1'i 24 saniye, her 100'den 1'i 46 saniye beklemektedir. Bu yüzden "
+        "yalnızca ortalamaya değil, en kötü %5'in nasıl beklediğine de "
+        "bakmak gereklidir.",
         STYLE_BODY_FIRST,
     ))
 
-    flow.append(Paragraph("Jain's Fairness Index", STYLE_H3))
+    flow.append(Paragraph("Yön Adaleti Ölçütü", STYLE_H3))
     flow.append(Paragraph(
-        "Yönler arası eşit dağılımı ölçer:",
-        STYLE_BODY,
-    ))
-    flow.append(Paragraph(
-        "<b>F = (Σ x<sub>i</sub>)² / (n × Σ x<sub>i</sub>²)</b>",
-        STYLE_CODE,
-    ))
-    flow.append(Paragraph(
-        "F = 1 mükemmel adil (tüm yönler aynı bekleme), F = 1/n tek yön "
-        "avantajlı (4 yön için min = 0.25). Sabit kontrolde F = 0.996 "
-        "olması 'fairness paradoksu' yaratır (Bölüm 5.1).",
+        "Bu ölçüt, bekleme süresinin dört yön arasında ne kadar eşit "
+        "dağıldığını gösterir. Değeri 0 ile 1 arasındadır: 1'e yakın "
+        "olması her yöndeki sürücülerin yaklaşık aynı süreyi beklediğini, "
+        "0.25 ise yalnızca tek bir yönün avantajlı olduğunu gösterir. "
+        "Sabit yöntemde bu değerin 0.996 olması Bölüm 5.1'de açıklanan "
+        "bir yanılgıya yol açmaktadır.",
         STYLE_BODY_FIRST,
     ))
 
-    flow.append(Paragraph("CO2 / Yakıt Proxy", STYLE_H3))
+    flow.append(Paragraph("Çevresel Etki: Yakıt ve CO2", STYLE_H3))
     flow.append(Paragraph(
-        "Idle (motor çalışırken bekleme) yakıt tüketimi literatür "
-        "ortalamasından tahmin edilir:",
-        STYLE_BODY,
+        "Beklerken motoru çalışan araçların harcadığı yakıt, literatür "
+        "değerleri kullanılarak tahmin edilmektedir. Çevre Koruma "
+        "Ajansı'nın (EPA) verilerine göre boşta çalışan bir otomobil "
+        "saatte yaklaşık 0.6 litre yakıt tüketmekte ve her litre benzin "
+        "yaklaşık 2.3 kg karbondioksit (CO2) açığa çıkarmaktadır. Bu "
+        "değerlerle tüm araçların toplam bekleme süresinden tahmini "
+        "CO2 salımı hesaplanmıştır.",
+        STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "total_idle_s × 0.000167 L/s (EPA) × 2310 g/L benzin = CO2 (g)",
-        STYLE_CODE,
-    ))
-    flow.append(Paragraph(
-        "Sabit kontrolün 5737 g CO2 emisyonu, adaptif kontrolün 1271 g "
-        "ile karşılaştırıldığında <b>4 katı verimsiz</b> olarak "
-        "yorumlanır. Ortalama bir otomobilin 120 g/km CO2 emisyonu "
-        "üretmesi temel alındığında, sabit kontrolün fazla emisyonu "
-        "yaklaşık 37 km'lik bir araba sürüşüne eşdeğerdir.",
+        "Sabit yöntemin 5737 gram CO2 salımı, uyarlanır yöntemin 1271 "
+        "gramı ile karşılaştırıldığında yaklaşık <b>4 katı daha fazla "
+        "kirletici</b> üretildiğini ortaya koymaktadır. Ortalama bir "
+        "otomobilin kilometre başına yaklaşık 120 gram CO2 saldığı "
+        "düşünüldüğünde, sabit yöntemin ürettiği fazla salım yaklaşık "
+        "37 kilometrelik bir araç yolculuğuna denk gelmektedir.",
         STYLE_BODY_FIRST,
     ))
     flow.append(PageBreak())
 
-    flow.append(Paragraph("4.4. Burst Senaryosu", STYLE_H2))
+    flow.append(Paragraph("4.4. Ani Talep Senaryosu", STYLE_H2))
     flow.append(Paragraph(
         "Standart koşumun yarısında (30. dakika) 30 dakika boyunca "
-        "Kuzey yönüne ek +20 araç/dakika talep verilerek burst (ani "
-        "yığınlanma) senaryosu oluşturulmuştur. Bu senaryo okul çıkışı, "
-        "maç sonu stadyum trafiği, kaza/yol kapanması sonrası "
-        "yönlendirme gibi gerçek dünya durumlarını temsil eder.",
+        "Kuzey yönüne dakikada 20 araç ek talep gönderilerek ani bir "
+        "talep yığılması oluşturulmuştur. Bu durum okul çıkışı, maç sonu "
+        "stadyum trafiği veya kaza nedeniyle yönlendirme gibi gerçek "
+        "hayatta sıkça yaşanan örnekleri temsil etmektedir.",
         STYLE_BODY_FIRST,
     ))
     burst_table = _make_table(
-        headers=["Kontrolcü", "Ort. (sn)", "p95 (sn)",
-                 "Acil (sn)", "Fairness"],
+        headers=["Yöntem", "Ort. (sn)", "En kötü %5 (sn)",
+                 "Acil (sn)", "Adalet"],
         rows=[
             ["Sabit Zamanlı", "1138.89", "3122.32", "1067.54", "0.293"],
-            ["Adaptif", "16.84", "28.09", "19.39", "0.864"],
+            ["Uyarlanır", "16.84", "28.09", "19.39", "0.864"],
             ["Tahmine Dayalı", "16.69", "27.46", "22.40", "0.875"],
             ["Acil Öncelikli", "17.46", "32.00", "10.13", "0.892"],
         ],
-        col_widths=[3.5 * cm, 2.2 * cm, 2.2 * cm, 2.2 * cm, 2 * cm],
+        col_widths=[3.5 * cm, 2.0 * cm, 2.6 * cm, 2.0 * cm, 2 * cm],
     )
     flow.append(burst_table)
     flow.append(Paragraph(
-        "Tablo 4.2: Burst senaryosu sonuçları (5 seed × 4 saat).",
+        "Tablo 4.2: Ani talep senaryosu sonuçları (5 tekrar × 4 saat).",
         STYLE_CAPTION,
     ))
 
@@ -806,58 +814,61 @@ def section_results() -> list:
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "Hibrit predictive bu senaryoda da adaptif ile yakın ortalama "
-        "(16.69 vs 16.84) ancak daha düşük p95 (27.46 vs 28.09) ve "
-        "daha yüksek fairness (0.875 vs 0.864) vermiştir. Trend "
-        "yakalama avantajı burst durumlarında daha belirgin "
-        "görünmüştür.",
+        "Tahmine dayalı yöntem bu senaryoda da uyarlanır yönteme yakın "
+        "bir ortalama bekleme süresi vermiştir (16.69 ile 16.84 saniye). "
+        "Ancak en kötü %5 dilimde daha iyi (27.46 ile 28.09) ve adalet "
+        "ölçütünde daha yüksek (0.875 ile 0.864) sonuç elde edilmiştir. "
+        "Tahmine dayalı yöntemin eğilim yakalama özelliği, ani talep "
+        "yığılması durumlarında daha belirgin biçimde ortaya çıkmıştır.",
         STYLE_BODY_FIRST,
     ))
     flow.append(PageBreak())
 
-    flow.append(Paragraph("4.5. İstatistiksel Anlamlılık", STYLE_H2))
+    flow.append(Paragraph("4.5. Sonuçların İstatistiksel Güvenilirliği", STYLE_H2))
     flow.append(Paragraph(
-        "Hibrit predictive kontrolün adaptif kontrole göre p95 ve "
-        "fairness'ta gözlemlenen iyileşmesinin seed gürültüsü mü yoksa "
-        "gerçek bir tasarım kazanımı mı olduğunu test etmek için "
-        "Mann-Whitney U non-parametrik testi uygulanmıştır. Test, "
-        "bekleme süresi dağılımlarının normal olmadığı durumlarda da "
-        "geçerlidir.",
+        "Tahmine dayalı yöntemin uyarlanır yönteme göre 'en kötü %5 "
+        "dilimi' ve 'adalet' ölçütlerinde gözlenen küçük iyileşmenin "
+        "gerçekten bir iyileşme mi yoksa rastlantı sonucu mu olduğunu "
+        "anlamak için Mann-Whitney U adlı istatistiksel test "
+        "uygulanmıştır. Bu test, verilerin belirli bir dağılıma uymak "
+        "zorunda olmadığı durumlarda da güvenle kullanılabilir.",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "10 seed × 4 saat koşumun sonuçları:",
+        "10 tekrar × 4 saat koşumun sonuçları aşağıdaki tabloda "
+        "gösterilmiştir. p değeri ne kadar küçükse, gözlenen farkın "
+        "rastlantı eseri olma olasılığı o kadar düşüktür.",
         STYLE_BODY,
     ))
     stats_table = _make_table(
-        headers=["Karşılaştırma", "p", "Sembol", "Yorum"],
+        headers=["Karşılaştırma", "p değeri", "Anlamlılık", "Yorum"],
         rows=[
-            ["Adaptif vs Predictive (iki yönlü)", "0.97", "ns",
-             "trend bonusu ortalamayı kaybetmedi"],
-            ["Predictive p95 < Adaptif", "0.013", "*",
-             "kötü uçta anlamlı iyileşme"],
-            ["Predictive fairness > Adaptif", "0.0018", "**",
-             "yön adaletinde çok anlamlı"],
-            ["Sabit ortalama > Adaptif", "<0.001", "***",
-             "ana bulgu güçlü (sanity check)"],
+            ["Uyarlanır ile Tahmine Dayalı ortalama bekleme", "0.97",
+             "anlamlı değil", "ortalama kaybedilmedi"],
+            ["Tahmine Dayalı'nın en kötü %5 dilimi daha iyi", "0.013",
+             "anlamlı", "kötü uçta gerçek iyileşme"],
+            ["Tahmine Dayalı adalet daha yüksek", "0.0018",
+             "çok anlamlı", "yön adaletinde belirgin iyileşme"],
+            ["Sabit ortalama, Uyarlanır'dan büyük", "<0.001",
+             "çok güçlü", "ana sonuç istatistiksel olarak çok güçlü"],
         ],
-        col_widths=[5.5 * cm, 1.6 * cm, 1.6 * cm, 5.3 * cm],
+        col_widths=[5.0 * cm, 1.6 * cm, 2.3 * cm, 4.5 * cm],
         col_align=["LEFT", "CENTER", "CENTER", "LEFT"],
     )
     flow.append(stats_table)
     flow.append(Paragraph(
-        "Tablo 4.3: Mann-Whitney U p-değerleri. Sembol kongresi: "
-        "* p<0.05, ** p<0.01, *** p<0.001, ns = istatistiksel olarak "
-        "anlamsız.",
+        "Tablo 4.3: İstatistiksel test sonuçları. p değeri 0.05'in "
+        "altındaysa fark 'anlamlı', 0.01'in altındaysa 'çok anlamlı' "
+        "kabul edilmiştir.",
         STYLE_CAPTION,
     ))
     flow.append(Paragraph(
-        "Bonferroni çoklu test düzeltmesi uygulanırsa α eşiği 0.05/4 = "
-        "0.0125 olur; p95 sonucu (p=0.013) sınırda kalır, fairness "
-        "(p=0.0018) çok rahat geçer. Sonuçlar çoklu test düzeltmesine "
-        "de büyük ölçüde dayanıklıdır. Bu bulgu, hibrit predictive "
-        "tasarımının istatistiksel olarak anlamlı bir iyileşme "
-        "sağladığını ve şansa bağlanamayacağını kanıtlamaktadır.",
+        "Birden fazla karşılaştırma yapıldığı için daha sıkı bir eşik "
+        "(0.05/4 = 0.0125) kullanılsa bile, adalet sonucu (0.0018) çok "
+        "rahat geçer, en kötü %5 sonucu (0.013) ise sınırda kalır. Bu "
+        "durum, tahmine dayalı yöntemin uyarlanır yönteme göre küçük "
+        "ama gerçek bir iyileşme sağladığını göstermektedir; sonuçlar "
+        "rastlantıya bağlanamaz.",
         STYLE_BODY_FIRST,
     ))
     flow.append(PageBreak())
@@ -868,81 +879,85 @@ def section_discussion() -> list:
     flow = []
     flow.append(Paragraph("5. TARTIŞMA", STYLE_H1))
 
-    flow.append(Paragraph("5.1. Fairness Paradoksu", STYLE_H2))
+    flow.append(Paragraph("5.1. Adalet Yanılgısı", STYLE_H2))
     flow.append(Paragraph(
-        "Sabit zamanlı kontrolün fairness skoru 0.996 ile dört kontrolcü "
-        "içinde en yüksektir. Sezgisel olarak bu, 'sabit kontrolün en "
-        "adil olduğu' anlamına gelirdi. Ancak Jain's fairness index "
-        "sadece yönler arası <b>dağılım eşitliğini</b> ölçer; mutlak "
-        "bekleme değerlerinin iyi veya kötü olduğunu söylemez.",
+        "Sabit zamanlı yöntemin adalet ölçütü 0.996 değerine ulaşarak "
+        "dört yöntem içinde en yüksek olanıdır. İlk bakışta bu, sabit "
+        "yöntemin 'en adil yöntem' olduğu izlenimini verir. Ancak bu "
+        "ölçüt yalnızca dört yön arasındaki bekleme süresinin ne kadar "
+        "eşit dağıldığını ölçer; bekleme süresinin kendisinin iyi mi "
+        "yoksa kötü mü olduğu hakkında bilgi vermez.",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "Sabit kontrolde her yön yaklaşık aynı süreyi (~43.7 sn) "
-        "beklediği için dağılım eşittir, ancak bu eşit dağılım "
-        "<i>herkesi eşit ölçüde kötü bekletmek</i> anlamına gelir. "
-        "Adaptif kontrolün fairness'ı (0.852) daha düşüktür çünkü "
-        "kuyruğu uzun olan yön avantajlı muamele görüyor; ancak "
-        "ortalama bekleme 9.7 saniyeye düşmüştür. Bu durumda "
-        "<b>fairness ile ortalama bekleme</b> birlikte okunmalıdır: "
-        "performans karşılığında küçük bir adalet feragati toplam "
-        "refahı çok daha yüksek tutmaktadır.",
+        "Sabit yöntemde her yön yaklaşık 43.7 saniye beklediği için "
+        "dağılım eşittir; ancak bu eşit dağılım aslında "
+        "<i>herkesi eşit ölçüde kötü bekletmek</i> anlamına gelmektedir. "
+        "Uyarlanır yöntemin adaleti (0.852) bir miktar daha düşüktür "
+        "çünkü kalabalık yönlere daha çok yeşil verilmektedir. Buna "
+        "karşın ortalama bekleme süresi 9.7 saniyeye inmiştir. Yani "
+        "<b>adalet ölçütü ile ortalama bekleme birlikte değerlendirilmelidir</b>: "
+        "küçük bir adalet farkına karşın elde edilen büyük süre kazancı "
+        "toplam fayda açısından çok daha değerlidir.",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "Hibrit predictive bu trade-off'u daha da iyileştirmiş; "
-        "adaptifle aynı ortalamayı tutarken fairness'ı 0.891'e "
-        "(adaptifin 0.852'sinden anlamlı olarak yukarıya — p=0.0018) "
-        "çıkartmıştır.",
-        STYLE_BODY_FIRST,
-    ))
-
-    flow.append(Paragraph(
-        "5.2. Saf Trend Mantığının Başarısızlığı ve Hibrit Tasarım", STYLE_H2,
-    ))
-    flow.append(Paragraph(
-        "Predictive kontrolün ilk tasarımı, sadece 30 saniye sonrası "
-        "için tahmin edilen kuyruk uzunluğuna göre yön seçen saf trend "
-        "mantığıydı. 16 farklı parametre kombinasyonu (lookback K değerleri "
-        "{2, 3, 6, 12} ile forecast horizon değerleri {5, 10, 30, 60 saniye}) "
-        "sweep edilmiş; hiçbiri adaptif kontrolü geçememiştir. Bu, "
-        "başarısız olduğu kabul edilmesi ve farklı bir tasarıma "
-        "geçilmesi gereken bir negatif bulgudur.",
-        STYLE_BODY_FIRST,
-    ))
-    flow.append(Paragraph(
-        "Sebep: saf trend mantığı anlık kuyruğu görmezden geliyordu. "
-        "Eğer bir yönde şu an 10 araç bekliyorsa ama trend düşüşte ise "
-        "(predicted = 2), saf trend o yönü atlıyordu — gerçekte 10 araç "
-        "hâlâ orada bekliyor olmasına rağmen.",
-        STYLE_BODY_FIRST,
-    ))
-    flow.append(Paragraph(
-        "Hibrit çözüm bu hatayı ortadan kaldırır: anlık kuyruk temel "
-        "alınır, sadece <b>artan</b> trend bonus olarak eklenir (max(0, "
-        "predicted − current) ile azalan trend ceza yapmaz). Bu negatif "
-        "bulgudan pozitif tasarıma geçiş, çalışmanın sunduğu "
-        "metodolojik katkılardan biridir.",
+        "Tahmine dayalı yöntem ise bu dengeyi daha da iyileştirmiştir. "
+        "Uyarlanır yöntemle aynı ortalama bekleme süresini korurken, "
+        "adalet ölçütünü 0.852'den 0.891'e yükseltmiştir. Bu fark "
+        "istatistiksel olarak da anlamlı bulunmuştur (p=0.0018).",
         STYLE_BODY_FIRST,
     ))
 
-    flow.append(Paragraph("5.3. Çevresel Etki Yorumu", STYLE_H2))
     flow.append(Paragraph(
-        "CO2 ve yakıt hesabı gerçek ölçüm değildir; EPA literatür "
-        "sabitleri ile bir <b>proxy</b>'dir (0.6 L/saat idle tüketimi, "
-        "2310 g CO2/L benzin). Mutlak sayılar tartışılabilir çünkü "
-        "gerçek araçlar bazen kavşakta motoru kapatır, ortalama yakıt "
-        "tüketimi araca göre değişir. Ancak göreceli karşılaştırma "
-        "sağlamdır: sabit kontrolün adaptif kontrole göre 4 katı "
-        "verimsiz olduğu kesin. Bu, çevresel argümanın matematiğini "
-        "sağlar.",
+        "5.2. İlk Tasarımın Başarısızlığı ve Geliştirilmesi", STYLE_H2,
+    ))
+    flow.append(Paragraph(
+        "Tahmine dayalı yöntemin ilk hâlinde yalnızca gelecekteki "
+        "kuyruk uzunluğuna göre karar veriliyordu. 16 farklı parametre "
+        "kombinasyonu denenmiş, ancak hiçbiri uyarlanır yöntemi "
+        "geçememiştir. Bu, tasarımın başarısız olduğunu kabul edip "
+        "yöntemi yenilemenin gerekli olduğunu gösteren bir sonuçtu.",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "4 saatlik bir kavşakta sabit kontrolün adaptiften fazla 4466 g "
-        "CO2 üretmesi, bir otomobille 37 km daha fazla yol gitmenin "
-        "eşdeğeri emisyon yaratmaktadır. Bu, bir trafik ışığı "
-        "tasarımının çevresel boyutunu açıkça göstermektedir.",
+        "Başarısızlığın nedeni şudur: ilk tasarım, şu anki kuyruğu "
+        "görmezden gelip yalnızca gelecekteki tahminle karar veriyordu. "
+        "Örneğin bir yönde şu an 10 araç bekliyor olsa bile, tahmin "
+        "düşüş gösteriyorsa (örneğin 2 araca düşecek diyorsa) o yön "
+        "atlanıyordu. Oysa o 10 araç hâlâ kuyrukta bekleyen gerçek "
+        "araçlardı.",
+        STYLE_BODY_FIRST,
+    ))
+    flow.append(Paragraph(
+        "Geliştirilmiş tasarım bu hatayı ortadan kaldırmıştır: artık "
+        "şu anki kuyruk temel alınmakta, yalnızca kuyrukta bir <b>artış</b> "
+        "varsa buna ek bir puan eklenmektedir. Kuyruk azalıyorsa "
+        "herhangi bir ceza verilmemektedir. Olumsuz bir sonuçtan yola "
+        "çıkarak daha iyi bir tasarıma ulaşmak, çalışmanın yöntemsel "
+        "katkılarından biridir.",
+        STYLE_BODY_FIRST,
+    ))
+
+    flow.append(Paragraph("5.3. Çevresel Etkinin Değerlendirilmesi", STYLE_H2))
+    flow.append(Paragraph(
+        "CO2 ve yakıt hesabı doğrudan ölçümle değil, literatürdeki "
+        "ortalama değerlerle yapılmıştır (saatte 0.6 litre boşta yakıt "
+        "tüketimi, litre başına 2310 gram CO2). Mutlak rakamlar "
+        "tartışılabilir; çünkü gerçekte bazı araçlar kavşakta motoru "
+        "kapatır, ortalama yakıt tüketimi araç tipine göre değişir. "
+        "Ancak yöntemler arası göreli karşılaştırma sağlamdır: sabit "
+        "yöntem, uyarlanır yönteme göre dört kat daha fazla salım "
+        "üretmektedir.",
+        STYLE_BODY_FIRST,
+    ))
+    flow.append(Paragraph(
+        "Dört saatlik bir koşumda sabit yöntemin uyarlanır yönteme "
+        "göre 4466 gram fazla CO2 üretmesi, ortalama bir otomobille "
+        "yaklaşık 37 kilometre fazladan yol gitmenin yarattığı kirliliğe "
+        "denk gelmektedir. Bu sonuç, trafik ışığı tasarımının yalnızca "
+        "süre değil, çevre boyutuyla da değerlendirilmesi gerektiğini "
+        "ortaya koymaktadır.",
         STYLE_BODY_FIRST,
     ))
     flow.append(PageBreak())
@@ -953,38 +968,42 @@ def section_conclusion() -> list:
     flow = []
     flow.append(Paragraph("6. SONUÇ VE GELECEK ÇALIŞMALAR", STYLE_H1))
     flow.append(Paragraph(
-        "Bu çalışmada SimPy tabanlı olay tabanlı simülasyon ile dört "
-        "yollu bir trafik kavşağında dört farklı kontrol stratejisi "
-        "karşılaştırılmıştır. Temel bulgular:",
+        "Bu çalışmada Python ile yazılmış bir benzetim programı "
+        "kullanılarak dört yollu bir trafik kavşağında dört farklı "
+        "ışık kontrol yöntemi karşılaştırılmıştır. Elde edilen başlıca "
+        "sonuçlar şunlardır:",
         STYLE_BODY_FIRST,
     ))
     conclusions = [
-        "<b>Adaptif kontrol</b> sabit zamanlıdan dramatik bir iyileşme "
-        "sağlar: %77.8 ortalama bekleme düşüşü, %78 CO2 azalması.",
-        "<b>Acil öncelikli kontrol</b> ambulans bekleme süresini %85.7 "
-        "düşürür (40.4 → 5.8 sn) — bir hayat kurtarıcı olabilecek yedi "
-        "kat fark.",
-        "<b>Hibrit predictive</b> kontrol adaptifle ortalama beklemede "
-        "eşdeğer (Mann-Whitney p=0.97) iken p95'te %9, fairness'ta %4.5 "
-        "anlamlı iyileşme sağlar (p=0.013, p=0.0018).",
-        "<b>Burst senaryosunda</b> sabit kontrol kollapsa uğrar (67 kat "
-        "daha kötü); bu, gerçek dünyada okul çıkışı, kaza sonrası "
-        "yönlendirme gibi durumlarda neden adaptif sistemlerin tercih "
-        "edildiğini niceliksel olarak gösterir.",
-        "<b>Fairness paradoksu</b> sabit kontrolün yüksek fairness "
-        "skoruna rağmen kötü performanslı olduğunu, bu metriğin tek "
-        "başına yorumlanamayacağını ortaya koyar.",
+        "<b>Uyarlanır yöntem</b>, sabit yönteme göre büyük bir iyileşme "
+        "sağlamaktadır: ortalama bekleme süresi %77.8 azalmış, CO2 "
+        "salımı %78 düşmüştür.",
+        "<b>Acil öncelikli yöntem</b> ambulans bekleme süresini %85.7 "
+        "kısaltmaktadır (40.4 → 5.8 saniye). Bu yedi kat azalma, hayat "
+        "kurtarıcı bir öneme sahip olabilir.",
+        "<b>Tahmine dayalı yöntem</b>, uyarlanır yöntemle ortalama "
+        "beklemede aynı sonucu vermekle birlikte (p=0.97) en kötü %5 "
+        "dilimde %9 ve adalet ölçütünde %4.5 anlamlı iyileşme "
+        "sağlamaktadır (sırasıyla p=0.013 ve p=0.0018).",
+        "<b>Ani talep senaryosunda</b> sabit yöntem 67 kat daha kötü "
+        "sonuç vermektedir. Bu, gerçek hayatta okul çıkışı veya kaza "
+        "sonrası yönlendirme gibi durumlarda neden uyarlanır sistemlerin "
+        "tercih edildiğini sayısal olarak ortaya koymaktadır.",
+        "<b>Adalet yanılgısı</b>, sabit yöntemin yüksek adalet "
+        "değerine rağmen aslında kötü performans gösterdiğini ve bu "
+        "ölçütün tek başına yorumlanamayacağını göstermektedir.",
     ]
     for c in conclusions:
         flow.append(Paragraph(f"&bull; {c}", STYLE_BULLET))
 
     flow.append(Paragraph("Gelecek Çalışmalar", STYLE_H2))
     future = [
-        "Bağlı kavşak ağı modeli (yeşil dalga, network etkileri).",
+        "Bağlı kavşak ağı modellemesi (yeşil dalga ve birbirini etkileyen "
+        "kavşaklar).",
         "Yaya ve bisikletli modunun eklenmesi.",
         "Sola/sağa dönüş şeritleri ile çoklu şerit modellemesi.",
-        "Pekiştirmeli öğrenme tabanlı kontrolcü — sabit kurallar "
-        "yerine öğrenen ajan.",
+        "Pekiştirmeli öğrenme yöntemiyle çalışan bir kontrolcü — "
+        "sabit kurallar yerine deneme-yanılma ile öğrenen bir yapı.",
         "Gerçek hastane/şehir trafik verisi ile parametre kalibrasyonu.",
         "Hava koşulları (yağmur, sis) ve gece-gündüz etkilerinin "
         "eklenmesi.",
