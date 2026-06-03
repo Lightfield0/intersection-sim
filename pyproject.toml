@@ -18,6 +18,7 @@ dependencies = [
     "pandas>=2.0",
     "matplotlib>=3.7",
     "streamlit>=1.30",
+    "scipy>=1.10",
 ]
 
 [project.optional-dependencies]

@@ -29,9 +29,12 @@ def test_same_seeds_produce_same_kpis_adaptive() -> None:
 
 
 def test_compare_controllers_preserves_scenario_order() -> None:
-    """compare_controllers ALL_SCENARIOS sirasini korumali (fixed -> adaptive -> preemptive)."""
+    """compare_controllers ALL_SCENARIOS sirasini korumali.
+
+    Sıra: fixed -> adaptive -> predictive -> preemptive
+    """
     from intersection_sim.scenarios.runner import compare_controllers
 
     results = compare_controllers([0, 1], duration_hours=1.0)
     names = [r.scenario.name for r in results]
-    assert names == ["fixed", "adaptive", "preemptive"]
+    assert names == ["fixed", "adaptive", "predictive", "preemptive"]

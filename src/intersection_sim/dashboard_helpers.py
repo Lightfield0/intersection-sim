@@ -246,9 +246,9 @@ def _draw_direction_labels(ax: Any) -> None:
     """4 koseye N/E/S/W etiketleri."""
     label_positions = {
         "Kuzey": (0.0, _AXIS_LIMIT - 0.5),
-        "Dogu":  (_AXIS_LIMIT - 0.5, 0.0),
-        "Guney": (0.0, -_AXIS_LIMIT + 0.5),
-        "Bati":  (-_AXIS_LIMIT + 0.5, 0.0),
+        "Doğu":  (_AXIS_LIMIT - 0.5, 0.0),
+        "Güney": (0.0, -_AXIS_LIMIT + 0.5),
+        "Batı":  (-_AXIS_LIMIT + 0.5, 0.0),
     }
     for text, (x, y) in label_positions.items():
         ha = "center" if y != 0 else ("left" if x < 0 else "right")
@@ -257,3 +257,145 @@ def _draw_direction_labels(ax: Any) -> None:
             x, y, text,
             ha=ha, va=va, fontsize=11, color="#1F2937", fontweight="bold",
         )
+
+
+# ---------- Faz Final: Dagilim helper'i --------------------------------------
+
+
+def prepare_wait_distribution(
+    collector: MetricsCollector,
+) -> dict[str, Any]:
+    """Bekleme suresi dagilim hazirlama.
+
+    Doner: {'overall': [...], 'normal': [...], 'emergency': [...],
+            'by_direction': {dir_value: [...]}}
+    Histogram/boxplot icin kullanilir.
+    """
+    overall: list[float] = []
+    normal: list[float] = []
+    emergency: list[float] = []
+    by_dir: dict[str, list[float]] = {d.value: [] for d in Direction}
+
+    for v in collector.vehicles_served:
+        if v.wait_time is None:
+            continue
+        overall.append(v.wait_time)
+        if v.vehicle_type is VehicleType.EMERGENCY:
+            emergency.append(v.wait_time)
+        else:
+            normal.append(v.wait_time)
+        by_dir[v.direction.value].append(v.wait_time)
+
+    return {
+        "overall": overall,
+        "normal": normal,
+        "emergency": emergency,
+        "by_direction": by_dir,
+    }
+
+
+# ---------- Faz Final: Saatlik heatmap DataFrame'i ---------------------------
+
+
+def prepare_hourly_heatmap(report: MetricsReport) -> pd.DataFrame:
+    """Saatlik bekleme heatmap'i icin uzun-format DataFrame.
+
+    Sutunlar: ``hour, direction, direction_tr, mean_wait_s``.
+    Streamlit veya matplotlib pivot ile heatmap yapabilir.
+    """
+    rows: list[dict[str, object]] = []
+    for d in ALL_DIRECTIONS:
+        per_hour = report.hourly_mean_wait_by_direction_s.get(d.value, [])
+        for hour, wait in enumerate(per_hour):
+            rows.append({
+                "hour": hour,
+                "direction": d.value,
+                "direction_tr": d.display_name_tr,
+                "mean_wait_s": wait if wait is not None else 0.0,
+            })
+    return pd.DataFrame(rows)
+
+
+# ---------- Faz Final v2: Sensitivity sweep --------------------------------
+
+
+def predictive_alpha_sweep(
+    alphas: list[float],
+    seeds: list[int],
+    duration_hours: float = 2.0,
+) -> pd.DataFrame:
+    """Hibrit predictive'in α parametresini taratip metrik tablosu uretir.
+
+    Her α icin: seed'ler boyunca koşum + ortalamalar. Sonuc DataFrame:
+    sutunlar ``alpha, mean_wait_s, p95_wait_s, fairness_index``.
+
+    Adaptive baseline da (α=0 değil, gerçek adaptive_controller) eklenir
+    karsilastirma kolayligi için.
+    """
+    from intersection_sim.controllers import predictive as pred_mod
+    from intersection_sim.controllers.adaptive import adaptive_controller
+    from intersection_sim.domain.config import SimConfig
+    from intersection_sim.simulation.runner import run_with_controller
+
+    rows: list[dict[str, object]] = []
+
+    # Adaptive baseline
+    a_means: list[float] = []
+    a_p95s: list[float] = []
+    a_fairs: list[float] = []
+    for s in seeds:
+        cfg = SimConfig(seed=s, horizon_seconds=duration_hours * 3600.0)
+        r = run_with_controller(cfg, adaptive_controller).metrics.build_report(
+            cfg.horizon_seconds,
+        )
+        mean_w = r.mean_wait_time_s
+        if mean_w is not None:
+            a_means.append(mean_w)
+        p95_w = r.wait_percentiles_s.get("p95")
+        if p95_w is not None:
+            a_p95s.append(p95_w)
+        fair = r.fairness_index
+        if fair is not None:
+            a_fairs.append(fair)
+    rows.append({
+        "label": "adaptive (baseline)",
+        "alpha": None,
+        "mean_wait_s": sum(a_means) / len(a_means) if a_means else None,
+        "p95_wait_s": sum(a_p95s) / len(a_p95s) if a_p95s else None,
+        "fairness_index": sum(a_fairs) / len(a_fairs) if a_fairs else None,
+    })
+
+    # Predictive sweep
+    original_alpha = pred_mod.HYBRID_ALPHA
+    try:
+        for alpha in alphas:
+            pred_mod.HYBRID_ALPHA = alpha
+            means: list[float] = []
+            p95s: list[float] = []
+            fairs: list[float] = []
+            for s in seeds:
+                cfg = SimConfig(seed=s, horizon_seconds=duration_hours * 3600.0)
+                r = run_with_controller(
+                    cfg, pred_mod.predictive_controller,
+                ).metrics.build_report(cfg.horizon_seconds)
+                mean_w = r.mean_wait_time_s
+                if mean_w is not None:
+                    means.append(mean_w)
+                p95_w = r.wait_percentiles_s.get("p95")
+                if p95_w is not None:
+                    p95s.append(p95_w)
+                fair = r.fairness_index
+                if fair is not None:
+                    fairs.append(fair)
+            rows.append({
+                "label": f"predictive α={alpha:.2f}",
+                "alpha": alpha,
+                "mean_wait_s": sum(means) / len(means) if means else None,
+                "p95_wait_s": sum(p95s) / len(p95s) if p95s else None,
+                "fairness_index": sum(fairs) / len(fairs) if fairs else None,
+            })
+    finally:
+        # α'yi geri restore et — diger testleri etkilemeyelim
+        pred_mod.HYBRID_ALPHA = original_alpha
+
+    return pd.DataFrame(rows)

@@ -19,9 +19,9 @@ from intersection_sim.domain.vehicle import Vehicle, VehicleType
 def test_directions_have_turkish_display_names() -> None:
     """Her yonun display_name_tr ozelligi Turkce kelime dondurmeli."""
     assert Direction.NORTH.display_name_tr == "Kuzey"
-    assert Direction.SOUTH.display_name_tr == "Guney"
-    assert Direction.EAST.display_name_tr == "Dogu"
-    assert Direction.WEST.display_name_tr == "Bati"
+    assert Direction.SOUTH.display_name_tr == "Güney"
+    assert Direction.EAST.display_name_tr == "Doğu"
+    assert Direction.WEST.display_name_tr == "Batı"
 
 
 def test_all_directions_contains_all_four_in_clockwise_order() -> None:

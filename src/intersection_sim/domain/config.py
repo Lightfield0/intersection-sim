@@ -15,6 +15,38 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from intersection_sim.domain.direction import Direction
 from intersection_sim.domain.signal import SignalConfig
 
+
+class BurstEvent(BaseModel):
+    """Belirli bir zamanda + yonde ani talep yiginlasmasi.
+
+    Gercek hayat karsiligi: okul cikisi, mac sonu, kaza sonrasi yonlendirme.
+    Sabit/adaptif kontrolculer bunu YAVAS yakalar; tahmine dayali (hibrit)
+    trend bonusu ile DAHA HIZLI tepki vermeli — burst senaryosu bunun
+    sinava tutuldugu yer.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    start_time_s: float = Field(
+        ge=0.0,
+        description="Burst'un basladigi sim-zamani (sn)",
+    )
+    duration_s: float = Field(
+        gt=0.0,
+        description="Burst suresi (sn)",
+    )
+    direction: Direction = Field(
+        description="Burst'un olustugu yon",
+    )
+    extra_rate_per_min: float = Field(
+        gt=0.0,
+        description="Ek arac/dk hizi (base/peak'in uzerine eklenir)",
+    )
+
+    def is_active_at(self, sim_time_s: float) -> bool:
+        """Verilen sim-zamaninda bu burst aktif mi?"""
+        return self.start_time_s <= sim_time_s < self.start_time_s + self.duration_s
+
 # Default geliş hizlari (arac / dakika).
 # Bu degerler proje spesifikasyonundan geliyor.
 _DEFAULT_BASE_RATES: dict[Direction, float] = {
@@ -64,6 +96,12 @@ class ArrivalProfile(BaseModel):
         description="Yeni uretilen bir aracin acil arac olma olasiligi",
     )
 
+    burst_events: list[BurstEvent] = Field(
+        default_factory=list,
+        description="Belirli zamanda + yonde ani ek talep listesi. "
+                    "Bos listede klasik base/peak Poisson kullanilir.",
+    )
+
     @model_validator(mode="after")
     def _check_directions(self) -> "ArrivalProfile":
         """Iki hiz tablosu da tum 4 yonu kapsamali."""
@@ -82,15 +120,26 @@ class ArrivalProfile(BaseModel):
     def rate_for(self, direction: Direction, sim_time_s: float) -> float:
         """Verilen sim-zamaninda belirli yonun anlik arac/dakika hizi.
 
-        sim_time_s'den saat-of-day cikarilir (mod 24). Eger bu saat
-        yogun aralikta ise peak tablo, aksi halde base tablo kullanilir.
+        Hesap:
+        1. sim_time_s'den saat-of-day cikarilir (mod 24). Yogun aralikta
+           ise peak, aksi halde base hiz.
+        2. Aktif burst event'leri varsa extra_rate_per_min eklenir
+           (toplam hiz = base/peak + tum aktif burst'ler).
         """
         hour_of_day = int((sim_time_s / 3600.0) % 24)
         in_morning = self.peak_morning[0] <= hour_of_day < self.peak_morning[1]
         in_evening = self.peak_evening[0] <= hour_of_day < self.peak_evening[1]
         if in_morning or in_evening:
-            return self.peak_rate_per_min[direction]
-        return self.base_rate_per_min[direction]
+            base = self.peak_rate_per_min[direction]
+        else:
+            base = self.base_rate_per_min[direction]
+
+        # Aktif burst event'leri ekle
+        extra = 0.0
+        for ev in self.burst_events:
+            if ev.direction is direction and ev.is_active_at(sim_time_s):
+                extra += ev.extra_rate_per_min
+        return base + extra
 
 
 class SimConfig(BaseModel):

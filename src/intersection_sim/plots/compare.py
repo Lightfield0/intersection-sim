@@ -1,16 +1,16 @@
-"""3 kontrolcunun karsilastirma grafikleri.
+"""4 kontrolcünün karşılaştırma grafikleri.
 
-Sunumun ana gorselleri burada uretiliyor. Tum grafikler sade matplotlib
-ile, ``Agg`` backend uzerinde (headless ortam icin). DejaVu Sans Turkce
+Sunumun ana gorselleri burada uretiliyor. Tüm grafikler sade matplotlib
+ile, ``Agg`` backend üzerinde (headless ortam için). DejaVu Sans Türkçe
 karakterleri sorunsuz gosterir, font.family olarak ayarlandi.
 
 Uc temel grafik:
-  1. plot_avg_wait        — ortalama bekleme (3 sutun bar chart)
+  1. plot_avg_wait        — ortalama bekleme (4 sutun bar chart)
   2. plot_emergency_wait  — acil arac beklemesi (vurgulu altin slayt)
-  3. plot_throughput      — throughput (kontrolcuden bagimsiz)
+  3. plot_throughput      — throughput (kontrolcüden bağımsız)
 
 Bonus:
-  4. plot_wait_distribution — 3 alt-grafik histogram (her kontrolcu icin)
+  4. plot_wait_distribution — 4 alt-grafik histogram (her kontrolcü için)
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ import numpy as np
 from intersection_sim.scenarios.runner import ScenarioResult
 from intersection_sim.simulation.runner import run_with_controller
 
-# Tum metinlerde DejaVu Sans — Turkce 'ı', 'ç', 'ğ' sorunsuz cizilir
+# Tüm metinlerde DejaVu Sans — Türkçe 'ı', 'ç', 'ğ' sorunsuz cizilir
 plt.rcParams["font.family"] = "DejaVu Sans"
 plt.rcParams["axes.titlesize"] = 14
 plt.rcParams["axes.labelsize"] = 11
@@ -50,7 +50,7 @@ def _setup_bar_axes(
 
 
 def plot_avg_wait(results: list[ScenarioResult], path: Path) -> None:
-    """Ortalama bekleme suresi — 3 sutunlu bar chart."""
+    """Ortalama bekleme suresi — 4 sutunlu bar chart."""
     fig, ax = plt.subplots(figsize=(8.0, 5.0))
     x, _ = _setup_bar_axes(ax, results)
 
@@ -62,7 +62,7 @@ def plot_avg_wait(results: list[ScenarioResult], path: Path) -> None:
         x, heights, yerr=errs, capsize=6,
         color=colors, edgecolor="#1F2937", linewidth=1.0,
     )
-    # Bar uzerine sayi etiketi
+    # Bar üzerine sayi etiketi
     for bar, h in zip(bars, heights):
         ax.text(
             bar.get_x() + bar.get_width() / 2, h + 1.0,
@@ -70,8 +70,8 @@ def plot_avg_wait(results: list[ScenarioResult], path: Path) -> None:
             ha="center", va="bottom", fontsize=12, fontweight="bold",
         )
 
-    ax.set_ylabel("Ortalama bekleme suresi (sn)")
-    ax.set_title("Ortalama Bekleme Suresi — 3 Kontrolcu")
+    ax.set_ylabel("Ortalama bekleme süresi (sn)")
+    ax.set_title("Ortalama Bekleme Süresi — 4 Kontrolcü")
     ax.set_ylim(0, max(heights) * 1.25)
 
     fig.tight_layout()
@@ -84,7 +84,7 @@ def plot_emergency_wait(results: list[ScenarioResult], path: Path) -> None:
     """Acil arac bekleme suresi — sunumun altin grafigi.
 
     Preemptive sutununa altin kenarli ekstra cerceve ekleniyor — sunumda
-    "bunun uzerine konusacak isim" sutunu vurgulamak icin.
+    "bunun üzerine konusacak isim" sutunu vurgulamak için.
     """
     fig, ax = plt.subplots(figsize=(8.0, 5.5))
     x, _ = _setup_bar_axes(ax, results)
@@ -114,11 +114,11 @@ def plot_emergency_wait(results: list[ScenarioResult], path: Path) -> None:
             ha="center", va="bottom", fontsize=12, fontweight="bold",
         )
 
-    ax.set_ylabel("Acil arac ortalama bekleme suresi (sn)")
-    ax.set_title("Acil Arac Bekleme Suresi — Ana Sunum Kozu", fontweight="bold")
+    ax.set_ylabel("Acil araç ortalama bekleme süresi (sn)")
+    ax.set_title("Acil Araç Bekleme Süresi — Ana Sunum Kozu", fontweight="bold")
     ax.set_ylim(0, max(heights) * 1.30)
 
-    # Alt yazi: Sabit -> Preemptive yuzde dususu
+    # Alt yazi: Sabit -> Preemptive yüzde dususu
     if len(results) >= 3:
         f_em = results[0].emergency_wait_s_mean
         p_em = results[2].emergency_wait_s_mean
@@ -126,7 +126,7 @@ def plot_emergency_wait(results: list[ScenarioResult], path: Path) -> None:
             drop_pct = (f_em - p_em) / f_em * 100.0
             fig.text(
                 0.5, 0.02,
-                f"Sabit Zamanli -> Acil Oncelikli: %{drop_pct:.1f} dusus",
+                f"Sabit Zamanlı → Acil Öncelikli: %{drop_pct:.1f} düşüş",
                 ha="center", fontsize=11, color="#1F2937", fontstyle="italic",
             )
 
@@ -137,7 +137,7 @@ def plot_emergency_wait(results: list[ScenarioResult], path: Path) -> None:
 
 
 def plot_throughput(results: list[ScenarioResult], path: Path) -> None:
-    """Throughput — kontrolculer arasinda neredeyse ayni."""
+    """Throughput — kontrolcüler arasinda neredeyse ayni."""
     fig, ax = plt.subplots(figsize=(8.0, 5.0))
     x, _ = _setup_bar_axes(ax, results)
 
@@ -156,13 +156,13 @@ def plot_throughput(results: list[ScenarioResult], path: Path) -> None:
             ha="center", va="bottom", fontsize=12, fontweight="bold",
         )
 
-    ax.set_ylabel("Throughput (arac / saat)")
-    ax.set_title("Throughput — Kontrolcu Tipinden Bagimsiz")
+    ax.set_ylabel("Throughput (araç / saat)")
+    ax.set_title("Throughput — Kontrolcü Tipinden Bağımsız")
     ax.set_ylim(0, max(heights) * 1.20)
 
     fig.text(
         0.5, 0.02,
-        "Gelis Poisson'a bagli; kontrolcu bekleme suresini optimize eder",
+        "Geliş Poisson'a bağlı; kontrolcü bekleme suresini optimize eder",
         ha="center", fontsize=10, color="#6B7280", fontstyle="italic",
     )
     fig.tight_layout(rect=(0, 0.04, 1, 1))
@@ -172,16 +172,16 @@ def plot_throughput(results: list[ScenarioResult], path: Path) -> None:
 
 
 def plot_wait_distribution(results: list[ScenarioResult], path: Path) -> None:
-    """Bonus: kontrolcu basina bekleme suresi histogrami (3 yan yana subplot).
+    """Bonus: kontrolcü basina bekleme suresi histogrami (3 yan yana subplot).
 
-    Her seed icin TUM araclarin wait_time'i toplanir, hepsi tek bir
-    histograma dokulur. Boylece "Adaptif'in cogu arac kisa bekler ama
+    Her seed için TUM araclarin wait_time'i toplanir, hepsi tek bir
+    histograma dokulur. Böylece "Adaptif'in çoğu arac kısa bekler ama
     bir kismi 30+ sn bekler" gibi distribution detaylari gozukur.
 
     NOT: Bu fonksiyon ScenarioResult kullanmiyor, dogrudan seed'leri
     yeniden kosturmasi gerekiyor — histogram ham wait_time degerlerine
     ihtiyac duyuyor, sadece ortalama yetersiz. Bu yuzden run'lari tekrar
-    yapiyor; performans icin az seed kullanin.
+    yapiyor; performans için az seed kullanin.
     """
     fig, axes = plt.subplots(1, len(results), figsize=(4.5 * len(results), 4.5),
                              sharey=True)
@@ -189,10 +189,10 @@ def plot_wait_distribution(results: list[ScenarioResult], path: Path) -> None:
         axes = [axes]
 
     for ax, res in zip(axes, results):
-        # Tum seed'lerin tum araclarinin bekleme sureleri
+        # Tüm seed'lerin tüm araclarinin bekleme sureleri
         waits: list[float] = []
         for run in res.runs:
-            # Run.report.mean_wait_time_s ortalama; ham veriye erisemiyoruz.
+            # Run.report.mean_wait_time_s ortalama; ham veriye erişemiyoruz.
             # Bu yuzden seed'i yeniden kosturup ham listeyi cikariyoruz.
             config = res.scenario.build_config(
                 seed=run.seed,
@@ -208,11 +208,11 @@ def plot_wait_distribution(results: list[ScenarioResult], path: Path) -> None:
             edgecolor="#1F2937", linewidth=0.5, alpha=0.85,
         )
         ax.set_title(res.scenario.display_name_tr, fontweight="bold")
-        ax.set_xlabel("Bekleme suresi (sn)")
+        ax.set_xlabel("Bekleme süresi (sn)")
         ax.grid(axis="y", linestyle="--", alpha=0.3)
 
-    axes[0].set_ylabel("Arac sayisi")
-    fig.suptitle("Bekleme Suresi Dagilimi — Tum Araclar",
+    axes[0].set_ylabel("Araç sayısı")
+    fig.suptitle("Bekleme Süresi Dağılımı — Tüm Araclar",
                  fontsize=14, fontweight="bold")
     fig.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -224,10 +224,10 @@ def save_all_plots(
     results: list[ScenarioResult], output_dir: Path,
     *, include_distribution: bool = True,
 ) -> dict[str, Path]:
-    """Tum karsilastirma grafiklerini diskte yazar.
+    """Tüm karşılaştırma grafiklerini diskte yazar.
 
     Donus: {"avg_wait": ..., "emergency_wait": ..., "throughput": ...}
-    Path objeleri (caller print/log icin kullanabilir).
+    Path objeleri (caller print/log için kullanabilir).
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     paths: dict[str, Path] = {

@@ -1,6 +1,6 @@
 """Coklu seed senaryo orkestrasyon ve toplulastirma.
 
-Bir senaryoyu N seed ile kosar, raporlari toplar ve ortalama / std
+Bir senaryoyu N seed ile kosar, raporları toplar ve ortalama / std
 hesaplar. ``compare_controllers(seeds, duration_hours)`` ucunu birden
 ayni cagrida kosturup karsilastirilabilir bir liste dondurur.
 
@@ -24,7 +24,7 @@ from intersection_sim.simulation.runner import run_with_controller
 
 @dataclass
 class ScenarioRun:
-    """Tek senaryo, tek seed: bir kosumun ham raporu."""
+    """Tek senaryo, tek seed: bir koşumun ham raporu."""
 
     name: str
     seed: int
@@ -33,15 +33,15 @@ class ScenarioRun:
 
 @dataclass
 class ScenarioResult:
-    """Bir senaryonun N seed boyunca ortalamasi + std degerleri.
+    """Bir senaryonun N seed boyunca ortalaması + std degerleri.
 
-    Sunum tablosu icin to_row() metodu duzlestirilmis satir dondurur.
+    Sunum tablosu için to_row() metodu duzlestirilmis satir dondurur.
     """
 
     scenario: ScenarioDef
     runs: list[ScenarioRun]
 
-    # ---- temel ozet ozellikleri ------------------------------------------
+    # ---- temel özet özellikleri ------------------------------------------
 
     @property
     def n_seeds(self) -> int:
@@ -92,8 +92,40 @@ class ScenarioResult:
     def mean_queue_length_mean(self) -> float:
         return float(mean(r.report.mean_queue_length for r in self.runs))
 
+    # ---- Faz Final genisletmesi ------------------------------------------
+
+    @property
+    def p95_wait_s_mean(self) -> float:
+        vals = [
+            r.report.wait_percentiles_s.get("p95") for r in self.runs
+        ]
+        valid = [v for v in vals if v is not None]
+        return float(mean(valid)) if valid else 0.0
+
+    @property
+    def p95_emergency_wait_s_mean(self) -> float:
+        vals = [
+            r.report.wait_percentiles_emergency_s.get("p95") for r in self.runs
+        ]
+        valid = [v for v in vals if v is not None]
+        return float(mean(valid)) if valid else 0.0
+
+    @property
+    def fairness_index_mean(self) -> float:
+        vals = [r.report.fairness_index for r in self.runs]
+        valid = [v for v in vals if v is not None]
+        return float(mean(valid)) if valid else 0.0
+
+    @property
+    def co2_grams_proxy_mean(self) -> float:
+        return float(mean(r.report.co2_grams_proxy for r in self.runs))
+
+    @property
+    def total_idle_seconds_mean(self) -> float:
+        return float(mean(r.report.total_idle_seconds for r in self.runs))
+
     def to_row(self) -> dict[str, object]:
-        """Duz bir sozluk — DataFrame'e ekleyip CSV'ye yazmak icin."""
+        """Duz bir sozluk — DataFrame'e ekleyip CSV'ye yazmak için."""
         return {
             "controller": self.scenario.name,
             "display_name_tr": self.scenario.display_name_tr,
@@ -107,6 +139,12 @@ class ScenarioResult:
             "throughput_per_hour_std": round(self.throughput_per_hour_std, 2),
             "mean_queue_length_mean": round(self.mean_queue_length_mean, 2),
             "preemption_count_mean": round(self.preemption_count_mean, 2),
+            # ---- Faz Final genisletmesi ----------------------------------
+            "p95_wait_s_mean": round(self.p95_wait_s_mean, 2),
+            "p95_emergency_wait_s_mean": round(self.p95_emergency_wait_s_mean, 2),
+            "fairness_index_mean": round(self.fairness_index_mean, 4),
+            "co2_grams_proxy_mean": round(self.co2_grams_proxy_mean, 2),
+            "total_idle_seconds_mean": round(self.total_idle_seconds_mean, 1),
         }
 
 
@@ -156,15 +194,16 @@ def compare_controllers(
     seeds: Iterable[int],
     duration_hours: float,
 ) -> list[ScenarioResult]:
-    """Uc kontrolcuyu da N seed ile kosup ScenarioResult listesi dondurur.
+    """Dort kontrolcuyu da N seed ile kosup ScenarioResult listesi dondurur.
 
-    Donus sirasi: ``ALL_SCENARIOS`` sirasi (fixed -> adaptive -> preemptive)
-    — sunumda da bu sirayla gosterilir.
+    Donus sirasi: ``ALL_SCENARIOS`` sirasi
+    (fixed -> adaptive -> predictive -> preemptive) — sunumda da bu
+    sirayla gosterilir.
     """
     seeds_list = list(seeds)
     return [run_scenario(s, seeds_list, duration_hours) for s in ALL_SCENARIOS]
 
 
 def results_to_dataframe(results: list[ScenarioResult]) -> pd.DataFrame:
-    """Sonuc listesini duzlestir, CSV'ye yazmak icin DataFrame yap."""
+    """Sonuc listesini duzlestir, CSV'ye yazmak için DataFrame yap."""
     return pd.DataFrame([r.to_row() for r in results])

@@ -25,9 +25,9 @@ class Direction(str, Enum):
         """Grafiklerde ve UI'da gosterilen Turkce ad."""
         names = {
             Direction.NORTH: "Kuzey",
-            Direction.SOUTH: "Guney",
-            Direction.EAST: "Dogu",
-            Direction.WEST: "Bati",
+            Direction.SOUTH: "Güney",
+            Direction.EAST: "Doğu",
+            Direction.WEST: "Batı",
         }
         return names[self]
 
