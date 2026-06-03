@@ -40,7 +40,12 @@ from intersection_sim.dashboard_helpers import (  # noqa: E402
     prepare_vehicle_type_counts,
     prepare_wait_distribution,
 )
-from intersection_sim.domain.config import SimConfig  # noqa: E402
+from intersection_sim.domain.config import (  # noqa: E402
+    ArrivalProfile,
+    BurstEvent,
+    SimConfig,
+)
+from intersection_sim.domain.direction import Direction  # noqa: E402
 from intersection_sim.simulation.runner import run_with_controller  # noqa: E402
 
 # Matplotlib tema
@@ -69,6 +74,21 @@ _CONTROLLERS = {
     "Acil Öncelikli": ("preemptive", preemptive_controller),
 }
 
+# Trafik profili preset'leri (base/peak rate çarpanı)
+_TRAFFIC_PROFILES = {
+    "Sakin (-30%)": 0.7,
+    "Normal (default)": 1.0,
+    "Yoğun (+50%)": 1.5,
+    "Çok Yoğun (+100%)": 2.0,
+}
+
+_DIR_LABELS = {
+    "Kuzey": Direction.NORTH,
+    "Güney": Direction.SOUTH,
+    "Doğu": Direction.EAST,
+    "Batı": Direction.WEST,
+}
+
 
 # ---------- Sidebar ---------------------------------------------------------
 
@@ -77,22 +97,98 @@ with st.sidebar:
     controller_label = st.selectbox(
         "Kontrolcü",
         list(_CONTROLLERS.keys()),
-        help="3 kontrolcüden hangisi: Sabit / Adaptif / Acil Öncelikli",
+        help="4 kontrolcüden hangisi: Sabit / Adaptif / Tahmine Dayalı / Acil Öncelikli",
     )
     duration_hours = st.slider("Süre (saat)", 1, 8, 4)
-    seed = st.number_input("Seed", min_value=0, max_value=10_000, value=42, step=1)
+    seed = st.number_input(
+        "Seed", min_value=0, max_value=10_000, value=42, step=1,
+    )
+
+    with st.expander("Gelişmiş ayarlar", expanded=False):
+        traffic_profile = st.selectbox(
+            "Trafik profili",
+            list(_TRAFFIC_PROFILES.keys()),
+            index=1,
+            help="Tüm yönlerin geliş hızını çarpan ile ölçekler.",
+        )
+        emergency_pct = st.slider(
+            "Acil araç oranı (%)",
+            min_value=0, max_value=15, value=5, step=1,
+            help="Gelen araçların kaç %'si acil (ambulans/itfaiye/polis).",
+        )
+
+        st.markdown("**Burst (ani yığın) olayı**")
+        burst_enabled = st.checkbox(
+            "Burst senaryosunu etkinleştir",
+            value=False,
+            help="Belirli zamanda + yönde ek talep yığınlaması ekler.",
+        )
+        if burst_enabled:
+            burst_dir_label = st.selectbox(
+                "Burst yönü", list(_DIR_LABELS.keys()), index=0,
+            )
+            burst_start_min = st.slider(
+                "Başlangıç (dakika)", 0, 240, 30, step=5,
+            )
+            burst_duration_min = st.slider(
+                "Süre (dakika)", 5, 90, 30, step=5,
+            )
+            burst_extra_rate = st.slider(
+                "Ek hız (araç/dk)", 5, 40, 20, step=1,
+                help="Base/peak hızının üzerine eklenir.",
+            )
 
     st.divider()
     run_btn = st.button("Çalıştır", type="primary", use_container_width=True)
 
+
+def _build_arrival_profile() -> ArrivalProfile:
+    """Sidebar değerlerinden ArrivalProfile üretir."""
+    mult = _TRAFFIC_PROFILES[traffic_profile]
+    base = {d: 0.4 * mult if d in (Direction.NORTH, Direction.SOUTH)
+            else 0.3 * mult for d in Direction}
+    peak = {Direction.NORTH: 0.8 * mult, Direction.SOUTH: 0.7 * mult,
+            Direction.EAST: 0.6 * mult, Direction.WEST: 0.6 * mult}
+    events: list[BurstEvent] = []
+    if burst_enabled:
+        events.append(BurstEvent(
+            start_time_s=float(burst_start_min) * 60.0,
+            duration_s=float(burst_duration_min) * 60.0,
+            direction=_DIR_LABELS[burst_dir_label],
+            extra_rate_per_min=float(burst_extra_rate),
+        ))
+    return ArrivalProfile(
+        base_rate_per_min=base,
+        peak_rate_per_min=peak,
+        emergency_probability=emergency_pct / 100.0,
+        burst_events=events,
+    )
+
+
 # Çalıştır butonuna basildiginda kosumu yap ve session'a koy.
 if run_btn:
     name, controller = _CONTROLLERS[controller_label]
+    arrivals = _build_arrival_profile()
     config = SimConfig(
         seed=int(seed),
         horizon_seconds=float(duration_hours) * 3600.0,
+        arrivals=arrivals,
     )
-    with st.spinner(f"Koşturuluyor: {controller_label} ({duration_hours} saat, seed={seed}) ..."):
+    extras: list[str] = []
+    if traffic_profile != "Normal (default)":
+        extras.append(f"trafik: {traffic_profile}")
+    if emergency_pct != 5:
+        extras.append(f"acil: %{emergency_pct}")
+    if burst_enabled:
+        extras.append(
+            f"burst: {burst_dir_label} {burst_start_min}-"
+            f"{burst_start_min + burst_duration_min} dk +{burst_extra_rate} araç/dk",
+        )
+    spin = (f"Koşturuluyor: {controller_label} ({duration_hours} saat, "
+            f"seed={seed})")
+    if extras:
+        spin += " · " + " · ".join(extras)
+    with st.spinner(spin + " ..."):
         intersection = run_with_controller(config, controller)
         report = intersection.metrics.build_report(config.horizon_seconds)
         st.session_state["current_run"] = {
@@ -102,6 +198,7 @@ if run_btn:
             "controller_name": name,
             "duration_hours": duration_hours,
             "seed": int(seed),
+            "scenario_extras": extras,
         }
 
 
@@ -133,8 +230,13 @@ with tab_run:
         intersection = run["intersection"]
         report = run["report"]
 
-        st.subheader(f"Senaryo: `{run['controller_label']}` · seed={run['seed']} · "
-                     f"{run['duration_hours']} saat")
+        st.subheader(
+            f"Senaryo: `{run['controller_label']}` · seed={run['seed']} · "
+            f"{run['duration_hours']} saat",
+        )
+        extras = run.get("scenario_extras") or []
+        if extras:
+            st.caption(" · ".join(extras))
 
         # 4 KPI metric kart
         cols = st.columns(4)
