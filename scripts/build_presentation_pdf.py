@@ -240,16 +240,25 @@ def slide_01_cover(pdf: PdfPages) -> None:
             color=TITLE_COLOR, fontweight="bold", va="center")
     ax.add_patch(Rectangle((0.9, 4.0), 2.5, ACCENT_LINE_H,
                            facecolor=ACCENT, edgecolor="none"))
-    ax.text(0.9, 4.7,
-            "Sabit · Adaptif · Acil Öncelikli — 3 Kontrol Stratejisi",
-            fontsize=18, color=BODY, va="center")
+    ax.text(0.9, 4.55,
+            "Sabit · Adaptif · Tahmine Dayalı · Acil Öncelikli",
+            fontsize=15, color=BODY, va="center")
+    ax.text(0.9, 4.95, "4 Kontrol Stratejisinin Karşılaştırmalı Analizi",
+            fontsize=13, color=BODY, va="center", fontstyle="italic")
 
-    # Alt bilgi
-    ax.text(0.9, 5.7, "Nihal Kemer", fontsize=14, color=BODY, va="center")
-    ax.text(0.9, 6.05, "22430070004 · Bilişim Sistemleri ve Teknolojileri",
+    # Alt bilgi — Mersin Üniversitesi
+    ax.text(0.9, 5.5, "Mersin Üniversitesi",
             fontsize=12, color=NEUTRAL, va="center")
-    ax.text(0.9, 6.40, "Benzetim Programları · Final Ödevi · 2026",
-            fontsize=12, color=NEUTRAL, va="center")
+    ax.text(0.9, 5.78,
+            "Erdemli Uygulamalı Teknoloji ve İşletmecilik Yüksekokulu",
+            fontsize=10.5, color=NEUTRAL, va="center")
+    ax.text(0.9, 6.05, "Bilişim Sistemleri ve Teknolojileri Bölümü",
+            fontsize=10.5, color=NEUTRAL, va="center")
+
+    ax.text(0.9, 6.45, "Nihal Kemer · 22430070004",
+            fontsize=12, color=BODY, va="center")
+    ax.text(0.9, 6.75, "Benzetim Programları · Final Projesi · 2026",
+            fontsize=11, color=NEUTRAL, va="center")
 
     # Sağ: kavşak ikonu
     _intersection_icon(ax, cx=10.5, cy=4.0, size=2.2)
@@ -347,7 +356,7 @@ def slide_05_flow(pdf: PdfPages) -> None:
 
     # Acillama notu
     ax.text(SLIDE_W / 2, 6.55,
-            "Kontrolcü (sabit/adaptif/preemptive) yeşil ışığı yönetir, "
+            "Kontrolcü (4 strateji) yeşil ışığı yönetir, "
             "araçlar yeşilde tek tek geçer.",
             fontsize=12, color=BODY, ha="center", va="center")
 
@@ -470,20 +479,21 @@ def slide_08_gold(pdf: PdfPages) -> None:
     fig, ax = _new_slide(6)
     _title(ax, "Sezgi vs Veri")
 
-    # Sol: senaryo tablosu (3 satir)
+    # Sol: senaryo tablosu (4 kontrolcü)
     rows = [
-        ["Kontrolcü",    "Ortalama", "Acil",    "Bulgu"],
-        ["Sabit",        "43.7 sn",  "40.4 sn", "referans"],
-        ["Adaptif",      "9.7 sn",   "7.2 sn",  "%78 ortalama düşüş"],
-        ["Acil Öncelikli","10.1 sn", "5.8 sn",  "%86 acil düşüş"],
+        ["Kontrolcü",       "Ortalama", "Acil",    "Bulgu"],
+        ["Sabit",           "43.7 sn",  "40.4 sn", "referans"],
+        ["Adaptif",         "9.7 sn",   "7.2 sn",  "%78 ortalama düşüş"],
+        ["Tahmine Dayalı",  "9.7 sn",   "6.8 sn",  "p95 %9, fairness %4.5 ↑"],
+        ["Acil Öncelikli",  "10.1 sn",  "5.8 sn",  "%86 acil düşüş"],
     ]
     _table(
         ax,
-        left=0.5, top=1.7, col_widths=[2.4, 1.5, 1.5, 2.5], row_height=0.6,
-        rows_data=rows, fontsize=13,
-        row_bg={2: "#F0FDF4", 3: "#DCFCE7"},   # hafif yeşil → koyu yeşil
-        row_fg={2: SUCCESS, 3: SUCCESS},
-        row_bold={2, 3},
+        left=0.5, top=1.7, col_widths=[2.4, 1.4, 1.4, 3.0], row_height=0.55,
+        rows_data=rows, fontsize=12,
+        row_bg={2: "#F0FDF4", 3: "#ECFDF5", 4: "#DCFCE7"},
+        row_fg={2: SUCCESS, 3: SUCCESS, 4: SUCCESS},
+        row_bold={2, 3, 4},
         col_align=["left", "right", "right", "left"],
     )
 
@@ -499,7 +509,7 @@ def slide_08_gold(pdf: PdfPages) -> None:
         '"Sabit kontrolde ambulans 40 saniye bekliyor.',
         'Adaptif kontrol bunu 7 saniyeye düşürdü.',
         'Acil öncelikli kontrol 6 saniyeye.',
-        'Aynı kavşak, üç farklı mantık, ambulans için 7 kat fark.',
+        'Aynı kavşak, dört farklı mantık, ambulans için 7 kat fark.',
         'Doğru kararı sezgi değil simülasyon verisi gösterdi."',
     ]
     for i, line in enumerate(quote_lines):
@@ -831,7 +841,7 @@ def slide_10_demo(pdf: PdfPages) -> None:
                 fontsize=14, color=BODY, va="center")
 
     # Sağ: kavşak diyagrami screenshot
-    inter_path = Path("results/screenshots/05_intersection_view.png")
+    inter_path = Path("results/screenshots/07_intersection_view.png")
     if inter_path.exists():
         _image(ax, inter_path, x=6.5, y=1.8, w=6.3, h=3.5)
         ax.text(9.65, 5.45, "Kavşak görseli (dashboard Sekme 3)",

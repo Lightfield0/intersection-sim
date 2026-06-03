@@ -9,7 +9,7 @@ doğrudan okuyabilecegi sade Türkçe cevaplar.
 
 Ekip çalışmasıyla yapıldı. Kod yazımı sırasında AI asistanindan destek
 alındı — özellikle spec yazma, hata ayiklama ve test kurma asamalarinda.
-Mimari kararlar (üç kontrolcü, polling pattern seçimi), senaryo tasarimi
+Mimari kararlar (dört kontrolcü, polling pattern seçimi), senaryo tasarimi
 (yön bazli hizlar, acil araç orani), parametre ayarlari, sunum hikayesi
 hepsi ekip tarafindan belirlendi. Asistan kodlama hızını artıran bir araç
 oldu, projenin sorumluluğu bende.
@@ -27,12 +27,12 @@ Bizim hedefimiz kodun savunmasiydi: polling daha basit, sonuç ayni.
 
 ---
 
-## 3. Throughput neden 3 kontrolcude ayni (~85 araç/saat)?
+## 3. Throughput neden 4 kontrolcude ayni (~85 araç/saat)?
 
 Throughput **araç gelisine** bağlı, kontrolcüye degil. Poisson hızı
 sabit; ayni saatte ayni sayida araç geliyor. Kontrolcü sadece **bekleme
 suresini optimize ediyor**, gelen aracı durduramaz veya geri cevirememez.
-Bu yuzden üç kontrolcuyle de ayni sayida araç (yaklaşık 85 saat basina)
+Bu yuzden dört kontrolcuyle de ayni sayida araç (yaklaşık 85 saat basina)
 karşıya geciyor. Mesele "ne kadar bekliyorlar" — bu konuda dramatik fark
 var: 43 saniye → 9 saniye.
 
@@ -257,7 +257,7 @@ benzetimi). Sonuç:
 
 | Kontrolcü | Ort. (sn) | p95 (sn) | Notlar |
 |---|---:|---:|---|
-| Sabit Zamanlı | 1138.9 | 3122 | **catastrophic fail** |
+| Sabit Zamanlı | 1138.9 | 3122 | **ciddi performans çöküşü** |
 | Adaptif | 16.84 | 28.1 | trafik akıcı |
 | Tahmine Dayalı | **16.69** | **27.5** | trend yakaladı, küçük avantaj |
 | Acil Öncelikli | 17.46 | 32.0 | preemption sadece acil için |

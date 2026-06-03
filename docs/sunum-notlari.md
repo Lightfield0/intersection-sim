@@ -23,7 +23,7 @@ Projenin amacı tek bir kelimeyle özetlenebilir: **karşılaştırma**. Ayni
 kavsakta üç farkli trafik ışığı kontrol stratejisini calistirdik — sabit
 zamanlı, adaptif ve acil öncelikli — ve sayilarla hangisi daha iyi diye
 sorduk. Sonuç bizi biraz şaşırttı: ambulans bekleme süresi acisindan
-**üç kontrolcü arasinda yedi kat fark** çıktı.
+**dört kontrolcü arasinda yedi kat fark** çıktı.
 
 Yaklaşık on dakika surecek. Sonunda dashboard üzerinden canli demo da
 yapacagim, sorulara hazırım."
@@ -154,12 +154,12 @@ hesaplandi, comparison.csv'de mevcut.
 
 ---
 
-## Slayt 6 — Sezgi vs Veri (90 sn) — ALTIN SLAYT
+## Slayt 6 — Sezgi vs Veri (90 sn)
 
 ### Konusma metni
 "Bu sunumun en önemli slaytı. Lutfen butun dikkati buraya verin.
 
-Tabloda üç kontrolcü var. Sabit zamanlı — referansimiz. Adaptif — kuyruk
+Tabloda dört kontrolcü var. Sabit zamanlı — referansimiz. Adaptif — kuyruk
 uzunluğuna duyarlı; eger bir yön dolu ise daha uzun yeşil veriyor. Acil
 öncelikli — adaptif üzerine ek olarak ambulans gordugunde mevcut yesili
 kapatip acil yöne öncelik veriyor.
@@ -185,7 +185,7 @@ degil simülasyon verisi gösterdi.**"
 
 ### Olası sorular
 
-**S: Throughput neden 3 kontrolcude de ayni (~85/saat)?**
+**S: Throughput neden 4 kontrolcude de ayni (~85/saat)?**
 C: Throughput araç gelisine bağlı, kontrolcüye degil. Poisson hızı sabit;
 ayni saatte ayni araç sayısı geliyor ve hepsi en sonunda gecer. Kontrolcü
 **bekleme suresini** optimize eder, gelen aracı durduramaz. Bu yuzden
@@ -267,7 +267,7 @@ sağlam**: sabit kontrolün adaptife göre 4 katı verimsiz olduğu kesin.
 
 ---
 
-## Slayt 8 — Burst Senaryosu + İstatistiksel Anlamlılık (75 sn) — YENİ KOZ
+## Slayt 8 — Burst Senaryosu + İstatistiksel Anlamlılık (75 sn)
 
 ### Konusma metni
 "Şimdi iki ekstra katman: **burst senaryosu** ve **istatistiksel anlamlılık**.
@@ -276,7 +276,7 @@ Sol tarafta burst senaryosu. Standart 4 saatlik koşumun ortasında 30
 dakika boyunca Kuzey'e ekstra 20 araç/dakika ek talep verdik — okul
 çıkışı, maç sonu, kaza yönlendirmesi gibi gerçek dünyada görülen
 durumları taklit ediyor. Sonuçlar dramatik. **Sabit kontrol burst'te
-catastrophic fail eder: ortalama 1139 saniye bekleme, p95 3122
+ciddi performans çöküşü eder: ortalama 1139 saniye bekleme, p95 3122
 saniye — yani 50 dakika**. Adaptif ve hibrit predictive 16-17 saniye
 bandında kalıyor. Sabit kontrol burada **adaptiften 67 kat daha kötü**.
 

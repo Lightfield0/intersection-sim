@@ -150,7 +150,7 @@ def _make_table(
     alt_row_bg: str = "#F3F4F6",
 ) -> Table:
     """Standart tablo. col_align verilmezse: 1. sütun LEFT, kalan RIGHT."""
-    data = [headers] + rows
+    data = [headers, *rows]
     tbl = Table(data, colWidths=col_widths, repeatRows=1)
     n_cols = len(headers)
     if col_align is None:
@@ -292,34 +292,34 @@ def section_toc() -> list:
     flow.append(Paragraph("İÇİNDEKİLER", STYLE_H1))
     flow.append(Spacer(1, 0.4 * cm))
     entries = [
-        ("ÖZET", "ii"),
-        ("1. GİRİŞ", "1"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;1.1. Problem Tanımı", "1"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;1.2. Amaç ve Kapsam", "1"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;1.3. Motivasyon", "2"),
-        ("2. YÖNTEM VE TASARIM", "3"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;2.1. Olay Tabanlı Simülasyon Yaklaşımı", "3"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;2.2. Domain Modeli", "4"),
+        ("ÖZET", "2"),
+        ("1. GİRİŞ", "4"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;1.1. Problem Tanımı", "4"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;1.2. Amaç ve Kapsam", "4"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;1.3. Motivasyon", "4"),
+        ("2. YÖNTEM VE TASARIM", "5"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;2.1. Olay Tabanlı Simülasyon Yaklaşımı", "5"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;2.2. Domain Modeli", "5"),
         ("&nbsp;&nbsp;&nbsp;&nbsp;2.3. Dört Kontrolcünün Mantığı", "5"),
         ("3. UYGULAMA DETAYLARI", "7"),
         ("&nbsp;&nbsp;&nbsp;&nbsp;3.1. Mimari ve Polling Pattern", "7"),
         ("&nbsp;&nbsp;&nbsp;&nbsp;3.2. Preemption Mekanizması", "7"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;3.3. Hibrit Predictive Tasarımı", "8"),
-        ("4. BULGULAR", "9"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;4.1. Baseline Sonuçları", "9"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;4.2. Dört Kontrolcü Karşılaştırması", "10"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;4.3. Genişletilmiş Metrikler", "11"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;4.4. Burst Senaryosu", "13"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;4.5. İstatistiksel Anlamlılık", "14"),
-        ("5. TARTIŞMA", "15"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;5.1. Fairness Paradoksu", "15"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;5.2. Saf Trend Mantığının Başarısızlığı", "15"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;5.3. Çevresel Etki Yorumu", "16"),
-        ("6. SONUÇ VE GELECEK ÇALIŞMALAR", "17"),
-        ("KAYNAKÇA", "18"),
-        ("EKLER", "19"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;Ek A. GitHub Linki ve Proje Yapısı", "19"),
-        ("&nbsp;&nbsp;&nbsp;&nbsp;Ek B. Ekran Görüntüleri", "20"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;3.3. Hibrit Predictive Tasarımı", "7"),
+        ("4. BULGULAR", "8"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;4.1. Baseline Sonuçları", "8"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;4.2. Dört Kontrolcü Karşılaştırması", "8"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;4.3. Genişletilmiş Metrikler", "10"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;4.4. Burst Senaryosu", "11"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;4.5. İstatistiksel Anlamlılık", "12"),
+        ("5. TARTIŞMA", "13"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;5.1. Fairness Paradoksu", "13"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;5.2. Saf Trend Mantığının Başarısızlığı", "13"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;5.3. Çevresel Etki Yorumu", "13"),
+        ("6. SONUÇ VE GELECEK ÇALIŞMALAR", "14"),
+        ("KAYNAKÇA", "15"),
+        ("EKLER", "16"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;Ek A. GitHub Linki ve Proje Yapısı", "16"),
+        ("&nbsp;&nbsp;&nbsp;&nbsp;Ek B. Ekran Görüntüleri", "17"),
     ]
     for title, page in entries:
         dots = "." * max(1, 75 - len(title.replace("&nbsp;", " ")) - 6)

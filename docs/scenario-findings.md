@@ -84,7 +84,7 @@ Idle yakıt formülü (0.6 L/saat × 2.31 kg CO2/L) ile:
 - Tahmine Dayalı: 1673 g
 - Acil Öncelikli: 1328 g
 
-Sunum kozu: "Sezgisel sabit kontrolün maliyeti sadece zaman değil, **4
+Önemli bulgu: "Sezgisel sabit kontrolün maliyeti sadece zaman değil, **4
 kat daha fazla CO2**". Bir otomobil 120 g/km CO2 üretir → sabit kontrolün
 fazlasıyla **37 km'lik araba sürüşüne eşdeğer emisyon** üretiyor (4 saat,
 1 kavşak için).

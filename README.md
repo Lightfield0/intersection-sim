@@ -33,7 +33,7 @@ kapatip acil yöne öncelik).
 - **Streamlit dashboard** — 7 sekme (KPI / karşılaştırma / dağılım /
   saatlik heatmap / burst / sensitivity α sweep / kavşak görseli)
 - **Burst senaryosu** — ani Kuzey'e yığın talep; sabit kontrol 67×
-  catastrophic fail eder, predictive trend avantajı görünür
+  ciddi performans çöküşü eder, predictive trend avantajı görünür
 - **İstatistiksel anlamlılık** — Mann-Whitney U non-parametrik testi:
   p95 (p=0.013 *), fairness (p=0.0018 **)
 - **92 birim test** — mypy strict, ruff temiz, Mann-Whitney U istatistiksel anlamlılık
@@ -119,7 +119,7 @@ streamlit run dashboard.py
    Yoğun saat (07-09 / 17-19) trendi açıkça görünür.
 
 5. **Burst Senaryosu** — comparison_burst.csv tablosu + log-skala bar
-   chart. Sabit kontrolün catastrophic fail ettiği (67× kötü), hibrit
+   chart. Sabit kontrolün ciddi performans çöküşü ettiği (67× kötü), hibrit
    predictive'in trend avantajını gösteren senaryo.
 
 6. **Sensitivity α Sweep** — Hibrit predictive'in α parametre süpürmesi.
@@ -209,7 +209,7 @@ Sunum PDF: [docs/presentation.pdf](docs/presentation.pdf) (10 slayt).
     trend ekstrapolasyon doğrulaması.
   - **Faz Final v2** (test_burst_scenario.py, test_statistical_significance.py):
     BurstEvent yarı-açık zaman penceresi, multi-burst toplama, fixed
-    burst'te catastrophic fail, Mann-Whitney U ile p95 (p=0.013) ve
+    burst'te ciddi performans çöküşü, Mann-Whitney U ile p95 (p=0.013) ve
     fairness (p=0.0018) anlamlılık testleri.
 
 ## Teknik notlar
