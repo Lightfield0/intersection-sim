@@ -210,7 +210,7 @@ def section_cover() -> list:
     flow.append(Paragraph("SİMÜLASYONU", STYLE_COVER_TITLE))
     flow.append(Spacer(1, 0.4 * cm))
     flow.append(Paragraph(
-        "Sabit, Adaptif, Tahmine Dayalı ve Acil Öncelikli "
+        "Sabit, Uyarlanır, Tahmine Dayalı ve Acil Öncelikli "
         "4 Kontrol Stratejisinin Karşılaştırmalı Analizi",
         STYLE_COVER_SUB,
     ))
@@ -630,7 +630,7 @@ def section_results() -> list:
         headers=["Metrik", "Değer"],
         rows=[
             ["Ortalama bekleme", "43.72 sn"],
-            ["p95 bekleme", "101.52 sn"],
+            ["En kötü %5 bekleme", "101.52 sn"],
             ["Acil araç bekleme", "40.43 sn"],
             ["Saatte geçen araç sayısı", "85.2"],
             ["Yön adaleti (0–1 arası)", "0.996"],
@@ -799,18 +799,18 @@ def section_results() -> list:
 
     flow.append(_figure(
         "results/comparison_burst.png",
-        "Şekil 4.2: Burst senaryosunda ortalama bekleme ve p95. "
-        "Logaritmik ölçek kullanılmıştır (sabit kontrolün değeri "
-        "diğer kontrolcüyle aynı eksene sığmamaktadır).",
+        "Şekil 4.2: Ani talep senaryosunda ortalama bekleme ve en kötü "
+        "%5 dilim. Logaritmik ölçek kullanılmıştır (sabit yöntemin "
+        "değeri diğer yöntemlerle aynı eksene sığmamaktadır).",
     ))
 
     flow.append(Paragraph(
-        "Bulgu: Sabit kontrol burst senaryosunda <b>adaptif kontrole "
-        "göre 67 kat daha kötü</b> ortalama bekleme üretmiştir (1139 vs "
-        "16.84 saniye). p95 değeri 3122 saniye (yaklaşık 52 dakika) "
-        "olmuştur. Bu sonuç, sabit kontrolün talep paterni hızla "
-        "değişen senaryolarda ciddi performans çöküşü yaşadığını "
-        "kanıtlamaktadır.",
+        "Bulgu: Sabit yöntem, ani talep senaryosunda <b>uyarlanır "
+        "yönteme göre 67 kat daha kötü</b> ortalama bekleme üretmiştir "
+        "(1139 saniyeye karşı 16.84 saniye). En kötü %5 dilim 3122 "
+        "saniyeyi (yaklaşık 52 dakika) bulmuştur. Bu sonuç, sabit "
+        "yöntemin talebin hızla değiştiği durumlarda ciddi bir performans "
+        "çöküşü yaşadığını ortaya koymaktadır.",
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
@@ -1075,7 +1075,7 @@ def section_appendix() -> list:
     ))
     flow.append(Paragraph("Proje yapısı (özet):", STYLE_BODY))
     proj_struct = """intersection-sim/
-├── dashboard.py                 # Streamlit interaktif dashboard (7 sekme)
+├── dashboard.py                 # Etkileşimli panel (7 sekme)
 ├── docs/
 │   ├── presentation.pdf         # 10 slayt sunum
 │   ├── rapor.pdf                # Bu rapor
@@ -1083,8 +1083,8 @@ def section_appendix() -> list:
 │   ├── scenario-findings.md     # Detaylı bulgular
 │   └── sunum-notlari.md         # Sunum konuşma metni
 ├── results/
-│   ├── comparison.csv           # 4 kontrolcü × 5 seed temel sonuçlar
-│   ├── comparison_burst.csv     # Burst senaryosu sonuçları
+│   ├── comparison.csv           # 4 yöntem × 5 tekrar temel sonuçlar
+│   ├── comparison_burst.csv     # Ani talep senaryosu sonuçları
 │   └── comparison_*.png         # Karşılaştırma grafikleri
 ├── scripts/
 │   ├── build_presentation_pdf.py
@@ -1094,7 +1094,7 @@ def section_appendix() -> list:
 │   ├── controllers/             # fixed, adaptive, predictive, preemptive
 │   ├── domain/                  # Direction, Vehicle, SignalConfig
 │   ├── metrics/                 # MetricsCollector + Report
-│   ├── scenarios/               # 4 senaryo + burst + compare CLI
+│   ├── scenarios/               # 4 senaryo + ani talep + karşılaştırma komutu
 │   ├── simulation/              # Intersection, arrivals, crossing
 │   └── plots/                   # matplotlib karşılaştırma grafikleri
 └── tests/                       # 92 birim test (mypy strict, ruff temiz)"""
@@ -1107,34 +1107,39 @@ def section_appendix() -> list:
 
     flow.append(Paragraph("Ek B. Ekran Görüntüleri", STYLE_H2))
     flow.append(Paragraph(
-        "Streamlit dashboard 7 sekmeli interaktif bir arayüz sunar. "
-        "Aşağıda seçilmiş sekmelerin ekran görüntüleri yer almaktadır.",
+        "Çalışmanın etkileşimli paneli yedi sekmeden oluşur. Aşağıda "
+        "seçilen sekmelerin ekran görüntüleri yer almaktadır.",
         STYLE_BODY_FIRST,
     ))
     screenshots = [
         ("results/screenshots/01_kpi_summary.png",
-         "Şekil B.1: Senaryo Çalıştır sekmesi. 8 KPI metric kartı "
-         "(ortalama bekleme, acil, throughput, preemption + p95, "
-         "fairness, CO2, idle), zaman serisi grafiği ve yön bazlı "
-         "bekleme bar chart."),
+         "Şekil B.1: Senaryo Çalıştır sekmesi. Üst sırada temel "
+         "göstergeler (ortalama bekleme, acil araç beklemesi, saatte "
+         "geçen araç, acil müdahale sayısı), alt sırada ek göstergeler "
+         "(en kötü %5 bekleme, yön adaleti, tahmini CO2 salımı, toplam "
+         "bekleme süresi) yer alır. Altta yön bazlı bekleme grafiği "
+         "ve zaman serisi gösterilir."),
         ("results/screenshots/02_comparison.png",
-         "Şekil B.2: 4 Kontrolcü Karşılaştırma sekmesi. comparison.csv "
-         "verilerinin tablo gösterimi + altta karşılaştırma PNG'leri."),
+         "Şekil B.2: Yöntem Karşılaştırma sekmesi. Dört yöntemin temel "
+         "sonuçları tablo halinde ve altta karşılaştırma grafikleri "
+         "olarak sunulur."),
         ("results/screenshots/03_distribution.png",
-         "Şekil B.3: Dağılım ve Çevresel sekmesi. Bekleme süresi "
-         "percentile tablosu, histogram + boxplot, CO2/yakıt/idle "
-         "metrik blokları."),
+         "Şekil B.3: Dağılım ve Çevre sekmesi. Bekleme süresi dilimleri "
+         "tablosu, dağılım ve kutu grafikleri, çevresel etki (yakıt, "
+         "CO2) blokları."),
         ("results/screenshots/04_heatmap.png",
-         "Şekil B.4: Saatlik Heatmap sekmesi. Yön × Saat ortalama "
-         "bekleme matrisi (YlOrRd colormap), saatlik throughput bar."),
+         "Şekil B.4: Saatlik Bekleme Isısı sekmesi. Yön ve saat "
+         "bilgisine göre ortalama bekleme süresinin renkli haritası, "
+         "yanında saatlik geçen araç sayısı."),
         ("results/screenshots/05_burst.png",
-         "Şekil B.5: Burst Senaryosu sekmesi. Sabit kontrolün 67 kat "
-         "kötü performans gösterdiği log-skala karşılaştırması."),
+         "Şekil B.5: Ani Talep Senaryosu sekmesi. Sabit zamanlı "
+         "yöntemin uyarlanır yönteme göre 67 kat daha kötü performans "
+         "gösterdiği logaritmik ölçekli karşılaştırma grafiği."),
         ("results/screenshots/07_intersection_view.png",
-         "Şekil B.6: Kavşak Görseli sekmesi. Yukarıdan gören statik "
-         "matplotlib diyagramı; slider ile herhangi bir sim-zamanındaki "
-         "kavşak durumu (yeşil yön + her yöndeki kuyruk uzunluğu) "
-         "incelenebilir."),
+         "Şekil B.6: Kavşak Görseli sekmesi. Koşumun seçilen anındaki "
+         "kavşak durumu (yeşil yön ve her yöndeki kuyruk uzunluğu) "
+         "yukarıdan görünüm olarak çizilir; kaydırma çubuğu ile farklı "
+         "zamanlara bakılabilir."),
     ]
     for path, caption in screenshots:
         flow.append(_figure(path, caption, max_width_cm=14))
