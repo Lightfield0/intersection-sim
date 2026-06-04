@@ -241,7 +241,7 @@ def slide_01_cover(pdf: PdfPages) -> None:
     ax.add_patch(Rectangle((0.9, 4.0), 2.5, ACCENT_LINE_H,
                            facecolor=ACCENT, edgecolor="none"))
     ax.text(0.9, 4.55,
-            "Sabit · Adaptif · Tahmine Dayalı · Acil Öncelikli",
+            "Sabit · Uyarlanır · Tahmine Dayalı · Acil Öncelikli",
             fontsize=15, color=BODY, va="center")
     ax.text(0.9, 4.95, "4 Kontrol Stratejisinin Karşılaştırmalı Analizi",
             fontsize=13, color=BODY, va="center", fontstyle="italic")
@@ -423,13 +423,13 @@ def slide_06_domain(pdf: PdfPages) -> None:
 
 def slide_07_baseline(pdf: PdfPages) -> None:
     fig, ax = _new_slide(5)
-    _title(ax, "Baseline: Sabit Zamanlı Kontrol")
+    _title(ax, "Başlangıç Sonuçları: Sabit Zamanlı Yöntem")
 
     # 4 büyük KPI karti (5 seed ortalaması)
     kpis = [
         ("Ortalama bekleme",  "43.7 sn", "tüm araçlar", WARNING),
         ("Acil bekleme",      "40.4 sn", "ciddi sorun", "#7F1D1D"),
-        ("Throughput",         "85.2",   "araç / saat", BLUE),
+        ("Saatlik geçen",      "85.2",   "araç / saat", BLUE),
         ("Tam çevrim",        "136 sn",  "her çevrim sabit", NEUTRAL),
     ]
     card_w, card_h = 2.85, 1.7
@@ -483,10 +483,10 @@ def slide_08_gold(pdf: PdfPages) -> None:
 
     # Sol: senaryo tablosu (4 kontrolcü)
     rows = [
-        ["Kontrolcü",       "Ortalama", "Acil",    "Bulgu"],
+        ["Yöntem",          "Ortalama", "Acil",    "Bulgu"],
         ["Sabit",           "43.7 sn",  "40.4 sn", "referans"],
-        ["Adaptif",         "9.7 sn",   "7.2 sn",  "%78 ortalama düşüş"],
-        ["Tahmine Dayalı",  "9.7 sn",   "6.8 sn",  "p95 %9, fairness %4.5 ↑"],
+        ["Uyarlanır",       "9.7 sn",   "7.2 sn",  "%78 ortalama düşüş"],
+        ["Tahmine Dayalı",  "9.7 sn",   "6.8 sn",  "kötü uç %9, adalet %4.5 ↑"],
         ["Acil Öncelikli",  "10.1 sn",  "5.8 sn",  "%86 acil düşüş"],
     ]
     _table(
@@ -509,7 +509,7 @@ def slide_08_gold(pdf: PdfPages) -> None:
                            facecolor=ACCENT, edgecolor="none"))
     quote_lines = [
         '"Sabit kontrolde ambulans 40 saniye bekliyor.',
-        'Adaptif kontrol bunu 7 saniyeye düşürdü.',
+        'Uyarlanır yöntem bunu 7 saniyeye düşürdü.',
         'Acil öncelikli kontrol 6 saniyeye.',
         'Aynı kavşak, dört farklı mantık, ambulans için 7 kat fark.',
         'Doğru kararı sezgi değil simülasyon verisi gösterdi."',
@@ -539,16 +539,16 @@ def slide_final_expansion(pdf: PdfPages) -> None:
     ax.add_patch(Rectangle((left_x + 0.08, left_y),
                            left_w - 0.08, left_h,
                            facecolor=LIGHT_GRAY, edgecolor="none"))
-    ax.text(left_x + 0.35, left_y + 0.5, "4. Kontrolcü:",
+    ax.text(left_x + 0.35, left_y + 0.5, "4. Yöntem:",
             fontsize=14, color=NEUTRAL, va="center")
     ax.text(left_x + 0.35, left_y + 0.95, "Tahmine Dayalı",
             fontsize=22, color=TITLE_COLOR, fontweight="bold", va="center")
 
     items = [
-        ("Hibrit skor", "score = anlık + 0.3 × max(0, tahmin − anlık)"),
-        ("Trend bonusu", "Son 60 sn lineer regresyon + 30 sn forecast"),
-        ("Adaptif tabanı",
-         "Anlık kuyruk korunur; artan trend bonus ekler"),
+        ("Karma puan", "puan = anlık kuyruk + 0.3 × kuyruktaki artış"),
+        ("Eğilim bonusu", "Son 60 sn kuyruk eğilimi, 30 sn için tahmin"),
+        ("Uyarlanır temel",
+         "Anlık kuyruk korunur, artan eğilim ek puan getirir"),
     ]
     iy = left_y + 1.6
     for head, body in items:
@@ -568,10 +568,10 @@ def slide_final_expansion(pdf: PdfPages) -> None:
     ax.text(left_x + 0.5, cmp_y + 0.22, "Sonuç (5 seed × 4 saat):",
             fontsize=10, color=NEUTRAL, va="center")
     ax.text(left_x + 0.5, cmp_y + 0.55,
-            "Ort. 9.71 sn  ·  Fairness 0.891",
+            "Ort. 9.71 sn  ·  Yön adaleti 0.891",
             fontsize=13, color=SUCCESS, fontweight="bold", va="center")
     ax.text(left_x + 0.5, cmp_y + 0.92,
-            "Adaptif: 9.70 / 0.852  →  p95 −%9, acil −%5, fairness +%4.5",
+            "Uyarlanır: 9.70 / 0.852  →  kötü uç −%9, acil −%5, adalet +%4.5",
             fontsize=10, color=BODY, va="center", fontstyle="italic")
 
     # Sağ panel — 4 yeni metrik (2×2 grid)
@@ -582,14 +582,14 @@ def slide_final_expansion(pdf: PdfPages) -> None:
 
     metrics = [
         # (baslik, deger, alt yazi, vurgu rengi)
-        ("Percentile (p95)", "26.5 sn",
-         "Hibrit p95: adaptif'ten −%9 (29.2→26.5)", BLUE),
-        ("Fairness (Jain)", "Hibrit 0.891",
-         "Adaptif 0.852 → hibrit +%4.5 (daha eşit)", "#9333EA"),
+        ("En Kötü %5 Bekleme", "26.5 sn",
+         "Tahmine dayalı: uyarlanırdan −%9 (29.2→26.5)", BLUE),
+        ("Yön Adaleti", "0.891",
+         "Uyarlanır 0.852 → tahmine dayalı +%4.5", "#9333EA"),
         ("CO2 / Yakıt", "Sabit −%78",
-         "Sabit 5737g → Adaptif 1271g (4× az)", SUCCESS),
-        ("Saatlik Heatmap", "Yön × Saat",
-         "Trafik homojen değil; pik saatler var", ACCENT),
+         "Sabit 5737g → Uyarlanır 1271g (4× az)", SUCCESS),
+        ("Saatlik Bekleme", "Yön × Saat",
+         "Trafik dengeli değil; yoğun saatler belirgin", ACCENT),
     ]
     positions = [
         (right_x, right_y),
@@ -614,7 +614,7 @@ def slide_final_expansion(pdf: PdfPages) -> None:
     _accent_callout(
         ax, x=right_x, y=cb_y + 0.15,
         w=2 * card_w + gap, h=0.55,
-        text="24 yeni test · percentile / fairness / CO2 / hibrit α sweep",
+        text="24 yeni test · dilimler / adalet / CO2 / karma katsayı denemesi",
         fontsize=11, bg="#FFF1E6", bar_color=ACCENT,
     )
 
@@ -623,8 +623,8 @@ def slide_final_expansion(pdf: PdfPages) -> None:
     ax.add_patch(Rectangle((0.6, box_y), 12.1, 0.45,
                            facecolor=TITLE_COLOR, edgecolor="none"))
     ax.text(SLIDE_W / 2, box_y + 0.22,
-            "Hibrit predictive: ortalamayı kaybetmeden p95 −%9, "
-            "acil −%5, fairness +%4.5. Saf trend (eski) sweep ile elendi.",
+            "Tahmine dayalı yöntem: ortalamayı kaybetmeden kötü uç −%9, "
+            "acil −%5, adalet +%4.5.",
             fontsize=11, color=WHITE, ha="center", va="center",
             fontweight="bold")
 
@@ -643,7 +643,7 @@ def slide_burst_stats(pdf: PdfPages) -> None:
     Alt callout: 'sabit 67× kötü, predictive iyileşme istatistiksel anlamlı'
     """
     fig, ax = _new_slide(8)
-    _title(ax, "Burst Senaryosu + İstatistiksel Anlamlılık")
+    _title(ax, "Ani Talep Senaryosu + İstatistiksel Güvenilirlik")
 
     # Sol kart — burst tablosu
     left_x, left_y = 0.6, 1.6
@@ -653,10 +653,10 @@ def slide_burst_stats(pdf: PdfPages) -> None:
     ax.add_patch(Rectangle((left_x + 0.08, left_y),
                            left_w - 0.08, left_h,
                            facecolor=LIGHT_GRAY, edgecolor="none"))
-    ax.text(left_x + 0.35, left_y + 0.45, "Burst senaryosu",
+    ax.text(left_x + 0.35, left_y + 0.45, "Ani talep senaryosu",
             fontsize=14, color=NEUTRAL, va="center")
     ax.text(left_x + 0.35, left_y + 0.95,
-            "30 dk Kuzey'e +20 araç/dk",
+            "30 dk boyunca Kuzey'e +20 araç/dk",
             fontsize=18, color=TITLE_COLOR, fontweight="bold", va="center")
     ax.text(left_x + 0.35, left_y + 1.35,
             "(okul çıkışı / maç sonu benzeri)",
@@ -667,9 +667,9 @@ def slide_burst_stats(pdf: PdfPages) -> None:
         ax, left=left_x + 0.35, top=left_y + 1.85,
         col_widths=[2.0, 1.6, 1.3], row_height=0.5,
         rows_data=[
-            ["Kontrolcü", "Ort. (sn)", "p95"],
+            ["Yöntem", "Ort. (sn)", "En kötü %5"],
             ["Sabit Zamanlı", "1138.9", "3122"],
-            ["Adaptif", "16.84", "28.1"],
+            ["Uyarlanır", "16.84", "28.1"],
             ["Tahmine Dayalı", "16.69", "27.5"],
             ["Acil Öncelikli", "17.46", "32.0"],
         ],
@@ -686,7 +686,7 @@ def slide_burst_stats(pdf: PdfPages) -> None:
                            facecolor="#FEE2E2", edgecolor=WARNING,
                            linewidth=1.0))
     ax.text(left_x + left_w / 2, left_y + 4.78,
-            "Sabit kontrol: 67× daha kötü ortalama bekleme",
+            "Sabit yöntem: 67× daha kötü ortalama bekleme",
             fontsize=11, color=WARNING, fontweight="bold",
             ha="center", va="center")
 
@@ -701,36 +701,40 @@ def slide_burst_stats(pdf: PdfPages) -> None:
     ax.text(right_x + 0.35, right_y + 0.45, "Mann-Whitney U",
             fontsize=14, color=NEUTRAL, va="center")
     ax.text(right_x + 0.35, right_y + 0.95,
-            "İstatistiksel Anlamlılık",
+            "Sonuçların Güvenilirliği",
             fontsize=18, color=TITLE_COLOR, fontweight="bold", va="center")
     ax.text(right_x + 0.35, right_y + 1.35,
-            "10 seed × 4 saat, non-parametrik",
+            "10 tekrar × 4 saat, dağılım bağımsız test",
             fontsize=10, color=NEUTRAL, fontstyle="italic", va="center")
 
-    # p-value satırları
+    # p değeri satırları
     pvals = [
-        ("Adaptif ≈ Predictive ort.", "p = 0.97", "ns", NEUTRAL,
+        ("Uyarlanır vs Tahmine Dayalı ortalama", "p = 0.97",
+         "anlamsız", NEUTRAL,
          "trend bonusu ortalamayı kaybetmedi"),
-        ("Predictive p95 < Adaptif", "p = 0.013", "*", SUCCESS,
-         "kötü uçta anlamlı iyileşme"),
-        ("Predictive fairness > Adaptif", "p = 0.0018", "**", SUCCESS,
-         "yönler arası adalette çok anlamlı"),
-        ("Sabit ≫ Adaptif ort.", "p < 0.001", "***", WARNING,
-         "sanity: ana bulgu çok güçlü"),
+        ("Tahmine Dayalı kötü uç < Uyarlanır", "p = 0.013",
+         "anlamlı", SUCCESS,
+         "kötü uçta gerçek iyileşme"),
+        ("Tahmine Dayalı adalet > Uyarlanır", "p = 0.0018",
+         "çok anlamlı", SUCCESS,
+         "yön adaletinde belirgin iyileşme"),
+        ("Sabit ortalama > Uyarlanır", "p < 0.001",
+         "çok güçlü", WARNING,
+         "ana bulgu çok güçlü"),
     ]
     py = right_y + 1.85
     for label, pval, sig, col, note in pvals:
-        # Sembol kutusu
-        ax.add_patch(Rectangle((right_x + 0.35, py), 0.5, 0.42,
+        # Etiket kutusu
+        ax.add_patch(Rectangle((right_x + 0.35, py), 0.95, 0.42,
                                facecolor=col, edgecolor="none"))
-        ax.text(right_x + 0.6, py + 0.21, sig,
-                fontsize=12, color=WHITE, fontweight="bold",
+        ax.text(right_x + 0.825, py + 0.21, sig,
+                fontsize=9, color=WHITE, fontweight="bold",
                 ha="center", va="center")
         # Açıklama
-        ax.text(right_x + 1.0, py + 0.08, label,
-                fontsize=11, color=TITLE_COLOR, fontweight="bold", va="top")
-        ax.text(right_x + 1.0, py + 0.42, f"{pval}  ·  {note}",
-                fontsize=9, color=BODY, va="top")
+        ax.text(right_x + 1.45, py + 0.08, label,
+                fontsize=10, color=TITLE_COLOR, fontweight="bold", va="top")
+        ax.text(right_x + 1.45, py + 0.42, f"{pval}  ·  {note}",
+                fontsize=8.5, color=BODY, va="top")
         py += 0.85
 
     # Alt vurgu — yeşil ribbon
@@ -738,8 +742,8 @@ def slide_burst_stats(pdf: PdfPages) -> None:
     ax.add_patch(Rectangle((0.6, box_y - 0.45), 12.1, 0.45,
                            facecolor=SUCCESS, edgecolor="none"))
     ax.text(SLIDE_W / 2, box_y - 0.225,
-            "Hibrit predictive iyileşmesi ŞANS DEĞİL — Mann-Whitney U ile "
-            "p95: p=0.013 (*), fairness: p=0.0018 (**) istatistiksel anlamlı.",
+            "Tahmine dayalı yöntemin iyileşmesi rastlantı değil — "
+            "kötü uç p=0.013, yön adaleti p=0.0018 ile anlamlı.",
             fontsize=11, color=WHITE, ha="center", va="center",
             fontweight="bold")
 
@@ -752,28 +756,28 @@ def slide_burst_stats(pdf: PdfPages) -> None:
 
 def slide_09_engineering(pdf: PdfPages) -> None:
     fig, ax = _new_slide(9)
-    _title(ax, "Mühendislik Detayları")
+    _title(ax, "Uygulama Detayları")
 
     items = [
         (
-            "Adaptif yeşil süresi",
-            "Kuyruk uzunluğuna göre dinamik; min 15, max 60 sn",
-            "green = clamp(queue * 3, 15, 60)",
+            "Uyarlanır yeşil süresi",
+            "Kuyruktaki araç sayısına göre değişir; en az 15, en fazla 60 sn",
+            "yeşil = kuyruk × 3 sn  (15–60 arası)",
         ),
         (
             "Acil araç tespiti",
-            "Her tick'te kuyruktaki araçlar taranır, type==EMERGENCY?",
-            "if vehicle.is_emergency: ...",
+            "Yarım saniyede bir kuyruk taranır, acil araç var mı?",
+            "eğer araç acil ise: önceliklendir",
         ),
         (
-            "Preemption",
-            "Acil araç varsa mevcut yeşil 5 sn'de kapanır, acil yöne 15 sn",
-            "green_end = env.now + 5  # preempt",
+            "Acil müdahale",
+            "Acil araç varsa mevcut yeşil 5 sn'de kapanır, ilgili yöne 15 sn",
+            "yeşil 5 sn'de bitir → acil yön 15 sn",
         ),
         (
-            "Polling pattern",
-            "Her 0.5 sn kuyruğa bakılır — sade ve debug'ı kolay",
-            "yield env.timeout(0.5)",
+            "Düzenli kontrol",
+            "Her yarım saniyede kuyruğa bakılır — anlaşılır ve test edilebilir",
+            "her 0.5 sn'de bir kontrol et",
         ),
     ]
     row_y = 1.7
