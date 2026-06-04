@@ -358,7 +358,7 @@ def slide_05_flow(pdf: PdfPages) -> None:
 
     # Acillama notu
     ax.text(SLIDE_W / 2, 6.55,
-            "Kontrolcü (4 strateji) yeşil ışığı yönetir, "
+            "Seçilen yöntem yeşil ışığı yönetir, "
             "araçlar yeşilde tek tek geçer.",
             fontsize=12, color=BODY, ha="center", va="center")
 

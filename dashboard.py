@@ -382,7 +382,7 @@ with tab_run:
             plt.close(fig)
 
 
-# ===== Tab 2 — 3 Kontrolcü Karşılaştırma ==================================
+# ===== Tab 2 — Yöntem Karşılaştırma =======================================
 
 with tab_compare:
     st.subheader("Dört Yöntemin Karşılaştırılması")

@@ -71,7 +71,7 @@ def plot_avg_wait(results: list[ScenarioResult], path: Path) -> None:
         )
 
     ax.set_ylabel("Ortalama bekleme süresi (sn)")
-    ax.set_title("Ortalama Bekleme Süresi — 4 Kontrolcü")
+    ax.set_title("Ortalama Bekleme Süresi — 4 Yöntem")
     ax.set_ylim(0, max(heights) * 1.25)
 
     fig.tight_layout()
@@ -115,7 +115,7 @@ def plot_emergency_wait(results: list[ScenarioResult], path: Path) -> None:
         )
 
     ax.set_ylabel("Acil araç ortalama bekleme süresi (sn)")
-    ax.set_title("Acil Araç Bekleme Süresi — Ana Sunum Kozu", fontweight="bold")
+    ax.set_title("Acil Araç Bekleme Süresi — Dört Yöntem", fontweight="bold")
     ax.set_ylim(0, max(heights) * 1.30)
 
     # Alt yazi: Sabit -> Preemptive yüzde dususu
@@ -156,8 +156,8 @@ def plot_throughput(results: list[ScenarioResult], path: Path) -> None:
             ha="center", va="bottom", fontsize=12, fontweight="bold",
         )
 
-    ax.set_ylabel("Throughput (araç / saat)")
-    ax.set_title("Throughput — Kontrolcü Tipinden Bağımsız")
+    ax.set_ylabel("Saatte geçen araç sayısı")
+    ax.set_title("Saatte Geçen Araç — Yönteme Göre Değişmez")
     ax.set_ylim(0, max(heights) * 1.20)
 
     fig.text(

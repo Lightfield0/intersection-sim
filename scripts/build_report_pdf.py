@@ -36,8 +36,8 @@ OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 # ---------- Türkçe karakter destekli font (Times New Roman) ----------------
 
 
-def _register_fonts() -> tuple[str, str, str]:
-    """Akademik Times font ailesini kaydet."""
+def _register_fonts() -> tuple[str, str, str, str]:
+    """Akademik Times font ailesi + Türkçe destekli monospace kaydet."""
     fonts_dir = Path("/System/Library/Fonts/Supplemental")
     try:
         pdfmetrics.registerFont(TTFont(
@@ -49,12 +49,24 @@ def _register_fonts() -> tuple[str, str, str]:
         pdfmetrics.registerFont(TTFont(
             "TRItalic", str(fonts_dir / "Times New Roman Italic.ttf"),
         ))
-        return "TR", "TRBold", "TRItalic"
+        regular, bold, italic = "TR", "TRBold", "TRItalic"
     except Exception:
-        return "Helvetica", "Helvetica-Bold", "Helvetica-Oblique"
+        regular, bold, italic = (
+            "Helvetica", "Helvetica-Bold", "Helvetica-Oblique",
+        )
+    # Türkçe karakter destekli monospace (kod/formül kutuları için).
+    # Yerleşik Courier ı/ş/ğ desteklemediği için Courier New TTF kullanılır.
+    try:
+        pdfmetrics.registerFont(TTFont(
+            "TRMono", str(fonts_dir / "Courier New.ttf"),
+        ))
+        mono = "TRMono"
+    except Exception:
+        mono = "Courier"
+    return regular, bold, italic, mono
 
 
-FONT_REGULAR, FONT_BOLD, FONT_ITALIC = _register_fonts()
+FONT_REGULAR, FONT_BOLD, FONT_ITALIC, FONT_MONO = _register_fonts()
 
 
 # ---------- Stiller --------------------------------------------------------
@@ -92,7 +104,7 @@ STYLE_CAPTION = _style("Caption", fontSize=9, leading=12,
                        textColor=colors.HexColor("#4B5563"),
                        fontName=FONT_ITALIC,
                        alignment=TA_CENTER, spaceAfter=10, spaceBefore=4)
-STYLE_CODE = _style("Code", fontName="Courier", fontSize=9.5, leading=12.5,
+STYLE_CODE = _style("Code", fontName=FONT_MONO, fontSize=9.5, leading=12.5,
                     textColor=colors.HexColor("#1F2937"),
                     backColor=colors.HexColor("#F3F4F6"),
                     borderPadding=6, borderRadius=2, spaceAfter=8)
@@ -148,13 +160,41 @@ def _make_table(
     col_align: list[str] | None = None,
     header_bg: str = "#1B4D3E",
     alt_row_bg: str = "#F3F4F6",
+    wrap: bool = False,
 ) -> Table:
-    """Standart tablo. col_align verilmezse: 1. sütun LEFT, kalan RIGHT."""
-    data = [headers, *rows]
-    tbl = Table(data, colWidths=col_widths, repeatRows=1)
+    """Standart tablo. col_align verilmezse: 1. sütun LEFT, kalan RIGHT.
+
+    wrap=True ise hücreler Paragraph'a sarılır; uzun metinler satır
+    kaydırır (taşma olmaz). Kısa sayısal tablolarda wrap=False yeterli.
+    """
     n_cols = len(headers)
     if col_align is None:
         col_align = ["LEFT"] + ["RIGHT"] * (n_cols - 1)
+
+    if wrap:
+        align_map = {"LEFT": TA_LEFT, "CENTER": TA_CENTER, "RIGHT": TA_LEFT}
+        # Başlık hücreleri (beyaz, kalın)
+        hdr_cells = []
+        for c, h in enumerate(headers):
+            stl = _style(f"_h{c}", fontName=FONT_BOLD, fontSize=10,
+                         leading=12, textColor=colors.white,
+                         alignment=align_map.get(col_align[c], TA_LEFT),
+                         spaceAfter=0)
+            hdr_cells.append(Paragraph(h, stl))
+        body_rows = []
+        for row in rows:
+            cells = []
+            for c, val in enumerate(row):
+                stl = _style(f"_b{c}", fontName=FONT_REGULAR, fontSize=10,
+                             leading=12, alignment=align_map.get(
+                                 col_align[c], TA_LEFT), spaceAfter=0)
+                cells.append(Paragraph(val, stl))
+            body_rows.append(cells)
+        data: list = [hdr_cells, *body_rows]
+    else:
+        data = [headers, *rows]
+
+    tbl = Table(data, colWidths=col_widths, repeatRows=1)
     style = [
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor(header_bg)),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
@@ -167,9 +207,9 @@ def _make_table(
         ("LINEBELOW", (0, 0), (-1, 0), 1, colors.HexColor("#374151")),
         ("LINEBELOW", (0, -1), (-1, -1), 0.5, colors.HexColor("#E5E7EB")),
     ]
-    # Sütun bazlı hizalama
-    for i, align in enumerate(col_align):
-        style.append(("ALIGN", (i, 0), (i, -1), align))
+    if not wrap:
+        for i, align in enumerate(col_align):
+            style.append(("ALIGN", (i, 0), (i, -1), align))
     for i in range(1, len(data)):
         if i % 2 == 0:
             style.append(("BACKGROUND", (0, i), (-1, i),
@@ -349,12 +389,11 @@ def section_introduction() -> list:
         STYLE_BODY_FIRST,
     ))
     flow.append(Paragraph(
-        "Gerçek bir trafik ışığı sistemiyle deneme yapmak — parametre "
-        "ayarı, alternatif algoritma denenmesi — yoğun trafik altında "
-        "riskli ve etik değildir. Bu noktada olay tabanlı simülasyon "
-        "(Discrete Event Simulation, DES) güvenli bir laboratuvar "
-        "ortamı sunar; gerçek bir kayıp riski olmadan farklı kontrol "
-        "stratejileri test edilebilir.",
+        "Gerçek bir trafik ışığı sistemiyle deneme yapmak — ayarları "
+        "değiştirmek, farklı yöntemleri denemek — yoğun trafik altında "
+        "hem riskli hem de uygun değildir. Bu noktada bilgisayar "
+        "benzetimi güvenli bir deneme ortamı sunar; gerçek bir kayıp "
+        "riski olmadan farklı kontrol yöntemleri denenebilir.",
         STYLE_BODY_FIRST,
     ))
 
@@ -852,8 +891,9 @@ def section_results() -> list:
             ["Sabit ortalama, Uyarlanır'dan büyük", "<0.001",
              "çok güçlü", "ana sonuç istatistiksel olarak çok güçlü"],
         ],
-        col_widths=[5.0 * cm, 1.6 * cm, 2.3 * cm, 4.5 * cm],
+        col_widths=[5.6 * cm, 1.6 * cm, 2.3 * cm, 4.0 * cm],
         col_align=["LEFT", "CENTER", "CENTER", "LEFT"],
+        wrap=True,
     )
     flow.append(stats_table)
     flow.append(Paragraph(

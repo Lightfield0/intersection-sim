@@ -71,7 +71,7 @@ def adaptive_scenario() -> ScenarioDef:
     """Adaptif kontrolcü senaryosu — kuyruga göre dinamik yesil."""
     return ScenarioDef(
         name="adaptive",
-        display_name_tr="Adaptif",
+        display_name_tr="Uyarlanır",
         controller=adaptive_controller,
         color=COLOR_ADAPTIVE,
         description_tr=(
