@@ -466,7 +466,7 @@ def slide_07_baseline(pdf: PdfPages) -> None:
 
     # Alt kose dipnot
     ax.text(SLIDE_W - 0.6, FOOTER_Y,
-            "5 seed ortalaması, 4 saat simülasyon",
+            "5 tekrar ortalaması, 4 saat koşum",
             fontsize=9, color=NEUTRAL,
             ha="right", va="center", fontstyle="italic")
 
@@ -565,7 +565,7 @@ def slide_final_expansion(pdf: PdfPages) -> None:
     ax.add_patch(Rectangle((left_x + 0.35, cmp_y), left_w - 0.7, 1.2,
                            facecolor="#ECFDF5", edgecolor=SUCCESS,
                            linewidth=1.2))
-    ax.text(left_x + 0.5, cmp_y + 0.22, "Sonuç (5 seed × 4 saat):",
+    ax.text(left_x + 0.5, cmp_y + 0.22, "Sonuç (5 tekrar × 4 saat):",
             fontsize=10, color=NEUTRAL, va="center")
     ax.text(left_x + 0.5, cmp_y + 0.55,
             "Ort. 9.71 sn  ·  Yön adaleti 0.891",
@@ -808,8 +808,8 @@ def slide_09_engineering(pdf: PdfPages) -> None:
 
     _accent_callout(
         ax, x=0.6, y=6.45, w=12.1, h=0.55,
-        text="92 birim test (+ Mann-Whitney U)  ·  mypy --strict temiz  ·  ruff temiz  ·  "
-             "Pydantic v2 domain modelleri",
+        text="92 birim test  ·  tip ve biçim denetimi temiz  ·  "
+             "doğrulanmış veri modelleri",
         fontsize=12, bg="#ECFDF5", bar_color=SUCCESS,
     )
 

@@ -22,7 +22,7 @@ kirmiziler ise diger üç yondeki bekleyenleri gösteriyor.
 
 Projenin amacı tek bir kelimeyle özetlenebilir: **karşılaştırma**. Ayni
 kavsakta üç farkli trafik ışığı kontrol stratejisini calistirdik — sabit
-zamanlı, adaptif ve acil öncelikli — ve sayilarla hangisi daha iyi diye
+zamanlı, uyarlanır ve acil öncelikli — ve sayilarla hangisi daha iyi diye
 sorduk. Sonuç bizi biraz şaşırttı: ambulans bekleme süresi acisindan
 **dört kontrolcü arasinda yedi kat fark** çıktı.
 
@@ -64,7 +64,7 @@ arıyoruz."
 **S: Bu calismayi gerçek bir kavsakta kullanabilir miyiz?**
 C: Doğrudan degil. Gerçek dünya parametreleri — sensor, kamera, donanım
 maliyeti — modelin disinda. Ama benzer mantikla gerçek sistemler kuruluyor.
-SCATS ve SCOOT sistemleri trafiklerin akisini canli olarak adaptif olarak
+SCATS ve SCOOT sistemleri trafiklerin akisini canli olarak uyarlanır olarak
 yonetiyor. Bizim model bu sistemlerin basitlestirilmis bir tasarimi.
 ## Slayt 3 — Araç Akışı (60 sn)
 
@@ -75,7 +75,7 @@ geldiklerinde o yön kuyruguna giriyor.
 
 Ortada KAVSAK + SINYAL kutusu. Kontrolcü burada karar verir: hangi yöne
 yeşil verilecek, kac saniye surecek? Sabit kontrolcü sırayla dolanir,
-adaptif kuyruk uzunluğuna bakar, acil öncelikli ise acil araç varsa
+uyarlanır kuyruk uzunluğuna bakar, acil öncelikli ise acil araç varsa
 prioriteyi degistirir. Yeşil verilen yondeki araçlar tek tek karşıya
 geciyor — her gecis 2 saniye suruyor.
 
@@ -160,26 +160,26 @@ hesaplandi, comparison.csv'de mevcut.
 ### Konusma metni
 "Bu sunumun en önemli slaytı. Lutfen butun dikkati buraya verin.
 
-Tabloda dört kontrolcü var. Sabit zamanlı — referansimiz. Adaptif — kuyruk
+Tabloda dört kontrolcü var. Sabit zamanlı — referansimiz. Uyarlanır — kuyruk
 uzunluğuna duyarlı; eger bir yön dolu ise daha uzun yeşil veriyor. Acil
-öncelikli — adaptif üzerine ek olarak ambulans gordugunde mevcut yesili
+öncelikli — uyarlanır üzerine ek olarak ambulans gordugunde mevcut yesili
 kapatip acil yöne öncelik veriyor.
 
-Önce **ortalama bekleme** sutununa bakalim. Sabit kontrolde 43.7. Adaptif
+Önce **ortalama bekleme** sutununa bakalim. Sabit kontrolde 43.7. Uyarlanır
 kontrole gectigimizde **9.7 saniyeye** düştü — yüzde 78 iyileşme. Acil
-öncelikli ile 10.1 saniyede kaldı, adaptif ile neredeyse ayni. Yanı
+öncelikli ile 10.1 saniyede kaldı, uyarlanır ile neredeyse ayni. Yanı
 'acil öncelikli' ekstra is normal araclari neredeyse hiç etkilemiyor.
 
 Simdi sağ taraftaki **acil sutuna** bakalim. Buradaki hikaye farkli.
-Sabit kontrolde acil araç 40.4 saniye bekliyor. Adaptif kontrolle 7.2'ye
+Sabit kontrolde acil araç 40.4 saniye bekliyor. Uyarlanır kontrolle 7.2'ye
 düştü. Acil öncelikli kontrole gectigimizde **5.8 saniyeye** indi. Sabit
 zamanlidan acil onceliklie toplamda **yüzde 86 düşüş** — yani **yedi kat
 fark**. Bir ambulans için bu zorunlu fark olabilir.
 
 Sağdaki grafikte ayni hikaye gorsellestirilmis. Kırmızı sabit, sarı
-adaptif, yeşil acil öncelikli — yeşil bar açık ara en küçük.
+uyarlanır, yeşil acil öncelikli — yeşil bar açık ara en küçük.
 
-Alintida özet: **Sabit kontrolde ambulans 40 saniye bekliyor. Adaptif
+Alintida özet: **Sabit kontrolde ambulans 40 saniye bekliyor. Uyarlanır
 kontrol bunu 7 saniyeye düşürdü. Acil öncelikli kontrol 6 saniyeye. Ayni
 kavşak, üç farkli mantık, ambulans için 7 kat fark. Doğru kararı sezgi
 degil simülasyon verisi gösterdi.**"
@@ -195,7 +195,7 @@ throughput ayni, bekleme dramatik farkli.
 **S: Acil öncelikli normal trafigi aksatmiyor mu?**
 C: 4 saatte ortalama **7 preemption** tetikleniyor — yani saatte iki
 kez. Her tetiklemede yaklaşık 5 saniyelik kesinti oluyor. Normal araç
-beklemesi adaptiften acil onceliklie sadece 0.4 saniye artıyor (9.7 →
+beklemesi uyarlanırdan acil onceliklie sadece 0.4 saniye artıyor (9.7 →
 10.1) — hayat kurtarmanin makul bedeli.
 
 ---
@@ -208,7 +208,7 @@ kontrolcü**, ikincisi **dört yeni metrik ailesi**.
 
 **Dördüncü kontrolcü: Tahmine Dayalı (hibrit).** İlk denememde saf trend
 mantığı kullandım — sadece 30 saniye sonrası kuyruğa bakıyordu. 16 farklı
-parametre kombinasyonu test ettim; hiçbiri adaptifi geçemedi, +2.5 ila +3.7
+parametre kombinasyonu test ettim; hiçbiri uyarlanıri geçemedi, +2.5 ila +3.7
 saniye daha kötüydü. Sebep: anlık kuyruğu görmezden geliyordu.
 
 Çözüm hibrit skor: `score = anlık_kuyruk + 0.3 × max(0, tahmin − anlık)`.
@@ -216,27 +216,27 @@ Yani anlık karar temel, sadece kuyruk artıyorsa trend bonusu eklenir.
 Azalan trend ceza yapmaz. α=0.3 sweep ile seçildi.
 
 Sonuç (5 seed × 4 saat):
-- Ortalama bekleme **adaptifle eşdeğer**: 9.71 vs 9.70 saniye, gürültü içinde
-- **p95 kötü uç adaptiften %9 daha iyi**: 26.5 vs 29.2 saniye
+- Ortalama bekleme **uyarlanırla eşdeğer**: 9.71 vs 9.70 saniye, gürültü içinde
+- **p95 kötü uç uyarlanırdan %9 daha iyi**: 26.5 vs 29.2 saniye
 - **Acil araç beklemesi %5 daha iyi**: 6.83 vs 7.20 saniye
 - **Fairness +%4.5**: 0.891 vs 0.852
 
-Yani: adaptifin ortalama performansını kaybetmeden adalet ve kötü uçta
+Yani: uyarlanırın ortalama performansını kaybetmeden adalet ve kötü uçta
 iyileşme. Bu **gerçek bir akademik bulgu** — saf trend hatalı, hibrit
 düzgün çalışıyor.
 
 **Dört yeni metrik ailesi.** Birincisi, **percentile** — ortalama yanıltıcı,
-p95 'kötü uç' gösterir. Adaptifte ortalama 9.7 saniye ama p95 yirmi
+p95 'kötü uç' gösterir. Uyarlanırte ortalama 9.7 saniye ama p95 yirmi
 dört saniye; her yirmi kişiden biri 24 saniye bekliyor.
 
 İkincisi, **Jain's fairness index** — yönler arası eşit dağılım. Burada
 ilginç bir paradoks var: sabit kontrol fairness 0.996 — en adil görünür.
-Ama bu **herkesi eşit ölçüde kötü bekletmek** demek. Adaptif 0.852 —
+Ama bu **herkesi eşit ölçüde kötü bekletmek** demek. Uyarlanır 0.852 —
 biraz daha düşük, çünkü kuyruk yoğunluğuna duyarlı; performans için
 adaleti biraz feda eder.
 
 Üçüncüsü, **çevresel etki** — idle motorlardan tahmini CO2. Sabit
-kontrol 4 saatte 5737 gram CO2 üretirken adaptif sadece 1271 gram —
+kontrol 4 saatte 5737 gram CO2 üretirken uyarlanır sadece 1271 gram —
 **dört kat fark**. Sezgisel sabit kontrolun maliyeti sadece zaman değil,
 çevre.
 
@@ -246,12 +246,12 @@ heatmap'te Güney yönü saat 1'de 19 saniyeye çıkıyor."
 
 ### Olası sorular
 
-**S: Tahmine Dayalı neden adaptifte yenemedi?**
+**S: Tahmine Dayalı neden uyarlanırte yenemedi?**
 C: Bu soruyu gerçekten ciddiye aldım. İlk denememde saf trend mantığı
 kullandım (sadece 30 sn sonrası tahmin); 16 parametre kombinasyonunu
-sweep ettim, hepsi adaptifi her seed'de geride bıraktı. Sebep: anlık
+sweep ettim, hepsi uyarlanıri her seed'de geride bıraktı. Sebep: anlık
 kuyruğu görmezden geliyordu. Hibrit çözüme geçtim: `score = anlık +
-0.3 × max(0, tahmin − anlık)`. Şimdi ortalama bekleme adaptifle eşdeğer
+0.3 × max(0, tahmin − anlık)`. Şimdi ortalama bekleme uyarlanırla eşdeğer
 (9.71 vs 9.70), AMA p95 %9 daha iyi, acil %5 daha iyi, fairness +%4.5.
 Bu negatif bulgudan pozitif tasarıma giden iyi bir akademik süreç.
 
@@ -264,7 +264,7 @@ Fairness × ortalama bekleme birlikte okunmalı.
 **S: CO2 sayıları gerçek mi?**
 C: Gerçek ölçüm değil, EPA literatür sabitleriyle proxy (idle 0.6 L/saat,
 2310 g CO2/L benzin). Mutlak sayı tartışılabilir ama **göreceli karşılaştırma
-sağlam**: sabit kontrolün adaptife göre 4 katı verimsiz olduğu kesin.
+sağlam**: sabit kontrolün uyarlanıra göre 4 katı verimsiz olduğu kesin.
 
 ---
 
@@ -278,24 +278,24 @@ dakika boyunca Kuzey'e ekstra 20 araç/dakika ek talep verdik — okul
 çıkışı, maç sonu, kaza yönlendirmesi gibi gerçek dünyada görülen
 durumları taklit ediyor. Sonuçlar dramatik. **Sabit kontrol burst'te
 ciddi performans çöküşü eder: ortalama 1139 saniye bekleme, p95 3122
-saniye — yani 50 dakika**. Adaptif ve hibrit predictive 16-17 saniye
-bandında kalıyor. Sabit kontrol burada **adaptiften 67 kat daha kötü**.
+saniye — yani 50 dakika**. Uyarlanır ve hibrit predictive 16-17 saniye
+bandında kalıyor. Sabit kontrol burada **uyarlanırdan 67 kat daha kötü**.
 
 Sağ tarafta istatistiksel anlamlılık. 10 seed × 4 saat koşum,
 Mann-Whitney U testi — non-parametrik, küçük örneklemde geçerli.
 Dört sonuç:
 
-- Birinci: adaptif ile predictive **ortalama bekleme** arasında fark
+- Birinci: uyarlanır ile predictive **ortalama bekleme** arasında fark
   istatistiksel olarak anlamsız, p=0.97. Yani 'trend bonusu ortalamayı
   kaybetmedi' iddiamız doğrulandı.
 
-- İkinci: predictive **p95'i** adaptiften düşük, p=0.013 — yıldız
+- İkinci: predictive **p95'i** uyarlanırdan düşük, p=0.013 — yıldız
   seviyesinde anlamlı.
 
-- Üçüncü: predictive **fairness'ı** adaptiften yüksek, p=0.0018 — iki
+- Üçüncü: predictive **fairness'ı** uyarlanırdan yüksek, p=0.0018 — iki
   yıldız, çok anlamlı.
 
-- Dördüncü sanity check: sabit kontrol adaptiften kötü, p<0.001 —
+- Dördüncü sanity check: sabit kontrol uyarlanırdan kötü, p<0.001 —
   üç yıldız, ana bulgu istatistiksel olarak çok güçlü.
 
 Yani **hibrit predictive iyileşmesi seed gürültüsü değil** — Mann-Whitney
@@ -315,7 +315,7 @@ hayatta etki bu kadar uç olmaz çünkü insanlar alternatif rotaya
 yönelir, sürücüler sabırla bekler veya başka noktaya gider. Ama
 ORANSAL fark — sabit kontrolün burst senaryosunda dramatik bozulması —
 gerçek dünyada da görülen bir davranış. SCATS/SCOOT sistemleri tam bu
-yüzden gerçek şehirlerde adaptif kontrol kullanır.
+yüzden gerçek şehirlerde uyarlanır kontrol kullanır.
 
 **S: p-değerleri için Bonferroni düzeltmesi yaptın mı?**
 C: Hayır, çoklu test düzeltmesi yapmadım — 4 test var. Eğer Bonferroni
@@ -330,7 +330,7 @@ sayılabilir; özellikle fairness çok anlamlı kalıyor.
 ### Konusma metni
 "Hizlica bir kaç teknik detay paylasayim.
 
-Birincisi, **adaptif yeşil süresi**: bir formul ile hesaplaniyor. Kuyrukta
+Birincisi, **uyarlanır yeşil süresi**: bir formul ile hesaplaniyor. Kuyrukta
 kac araç varsa, her birine 3 saniye veriyoruz. Minimum 15 saniye, maksimum
 60 saniye sınırla. Yanı kuyruk boş olsa bile 15 saniye yeşil aliyor, çok
 dolu olsa bile 60 saniyeyi gecmiyor — bu sinirlar diger yonlerin de hak
@@ -434,11 +434,11 @@ Detayli SSS `docs/faq.md` dosyasinda. En sik beklenenler:
 - "Throughput neden ayni?" -> Poisson sabit, kontrolcü bekleme suresini
   optimize eder.
 - "Acil öncelikli normal aracları aksatiyor mu?" -> Sadece +0.4 sn.
-- "Adaptif neden %78 düşürdü?" -> Boş yönü atlamak + queue × 3 sn.
+- "Uyarlanır neden %78 düşürdü?" -> Boş yönü atlamak + queue × 3 sn.
 - "Kullandiginiz parametreleri nasil sectiniz?" -> Literatür + sezgisel
   baslangic, sonra parametre sweep.
-- "Tahmine Dayalı neden adaptifte yenmedi?" -> Hibrit tasarımla ortalama
-  adaptifle eşdeğer (9.71 vs 9.70 sn), AMA p95 %9, acil %5, fairness %4.5
+- "Tahmine Dayalı neden uyarlanırte yenmedi?" -> Hibrit tasarımla ortalama
+  uyarlanırla eşdeğer (9.71 vs 9.70 sn), AMA p95 %9, acil %5, fairness %4.5
   daha iyi. Saf trend mantığı önce başarısızdı (sweep ile elendi); hibrit
   doğru tasarım.
 - "Fairness 0.996 sabitte, sabit mi en iyi?" -> Fairness sadece eşitliği

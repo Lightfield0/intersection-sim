@@ -41,7 +41,7 @@ var: 43 saniye → 9 saniye.
 ## 4. 5 seed yeterli mi, neden daha çok degil?
 
 5 seed bu calismada yeterli oldu çünkü **etki buyuklugu varyans
-gurultusunden çok büyük**. Adaptif kontrol sabit zamanliya göre yüzde
+gurultusunden çok büyük**. Uyarlanır kontrol sabit zamanliya göre yüzde
 78 ortalama bekleme düşürdü — varyans standart sapmasi yaklaşık
 saniye düzeyinde. Bu kadar dramatik bir fark için 5 seed istatistiksel
 guvenirligi sağlar. Daha çok seed (20, 50) sayıları 0.1 saniye düzeyinde
@@ -50,11 +50,11 @@ sayısı ile yeniden uretmek 30 saniye surer.
 
 ---
 
-## 5. Adaptif kontrol neden %78 düşürdü — bu rakam çok iddialı degil mi?
+## 5. Uyarlanır kontrol neden %78 düşürdü — bu rakam çok iddialı degil mi?
 
-İddialı ama doğru. Sebep iki: birincisi adaptif kontrolde **boş yönleri
+İddialı ama doğru. Sebep iki: birincisi uyarlanır kontrolde **boş yönleri
 atlama** var. Sabit kontrolda boş yöne bile 30 saniye yeşil verilirken
-adaptif kontrolde o yön atlaniyor — bu çevrim suresini kısaltır. İkincisi
+uyarlanır kontrolde o yön atlaniyor — bu çevrim suresini kısaltır. İkincisi
 **yeşil süresi kuyruga göre degişiyor**: çok yoğun yöne 60 saniyeye kadar
 yeşil, sakin yöne 15 saniye. Yoğun yön hızla bosaltiliyor, kuyruklar
 birikmiyor. İki etki birleşince ortalama bekleme dramatik dusuyor.
@@ -90,8 +90,8 @@ hassasiyeti, kamera tabanlı araç sayma, sinyal hardware'inin tepki
 süresi, donanım maliyeti. Bizim modelde bunlar yok. Ama benzer mantikla
 gerçek sistemler kuruluyor — **SCATS** (Sydney Coordinated Adaptive
 Traffic System) ve **SCOOT** (Split Cycle Offset Optimization Technique)
-gerçek trafik isiklarinda canli olarak adaptif yeşil süresi belirleyen
-sistemler. Bu projedeki adaptif kontrolcü basit bir SCATS varyantı
+gerçek trafik isiklarinda canli olarak uyarlanır yeşil süresi belirleyen
+sistemler. Bu projedeki uyarlanır kontrolcü basit bir SCATS varyantı
 olarak görülebilir.
 
 ---
@@ -114,7 +114,7 @@ Evet, gerekli. Test gruplari:
   modellerin doğru çalıştığını garantiler.
 - **Kontrolcü testleri** (fixed cycle, adaptive switching, preemption
   trigger) her kontrolcünün spesifik davranisini kanitlar.
-- **Hipotez testleri** (adaptif > sabit, preemptive < adaptif acil)
+- **Hipotez testleri** (uyarlanır > sabit, preemptive < uyarlanır acil)
   sunumdaki sayilarin gerçeklenebilir oldugunu kanıtlıyor.
 - **Reproducibility testleri** ayni seed → ayni KPI.
 
@@ -142,13 +142,13 @@ ayni sonucu üretir — tekrar uretilebilir. Test
 
 Çok az aksatiyor — saniye düzeyinde fark. 4 saatlik koşumda ortalama
 **7 preemption** tetikleniyor (saatte iki kez). Her tetikleme yaklaşık 5
-saniye kesinti yapiyor. Normal araç ortalama beklemesi adaptiften acil
+saniye kesinti yapiyor. Normal araç ortalama beklemesi uyarlanırdan acil
 onceliklie sadece **0.4 saniye artıyor** (9.7 → 10.1). Hayat kurtarmak
 için bu kuçuk bir bedel.
 
 ---
 
-## 13. Adaptif kontrol çevrim suresini nasil hesaplıyor?
+## 13. Uyarlanır kontrol çevrim suresini nasil hesaplıyor?
 
 İki bileşen: **yön seçimi** + **yeşil süresi**.
 
@@ -175,9 +175,9 @@ tasiyabilir.
 
 ---
 
-## 15. 4. kontrolcü "Tahmine Dayalı" ne yapıyor, adaptiften farkı ne?
+## 15. 4. kontrolcü "Tahmine Dayalı" ne yapıyor, uyarlanırdan farkı ne?
 
-Adaptifin **hibrit trend-aware** versiyonu. İlk denememizde saf trend
+Uyarlanırın **hibrit trend-aware** versiyonu. İlk denememizde saf trend
 mantığı (sadece "30 sn sonra ne olacak?" tahmini) kullandık — 16 parametre
 kombinasyonuyla sweep yaptık, hiçbiri adaptive'i geçemedi (+2.5 ila +3.7
 sn daha kötü, her seed'de). Sebep: anlık kuyruğu görmezden geliyordu.
@@ -187,13 +187,13 @@ Hibrit çözüm: `score(d) = current(d) + α × max(0, predicted(d) − current(
 > current) trend bonusu eklenir. Azalan trend negatif bonus yapmaz.
 
 Sonuç (5 seed × 4 saat):
-- Ortalama bekleme adaptif ile **eşdeğer**: 9.71 vs 9.70 sn (0.01 fark,
+- Ortalama bekleme uyarlanır ile **eşdeğer**: 9.71 vs 9.70 sn (0.01 fark,
   gürültü içinde)
-- **p95 kötü uç adaptif'ten %9.3 daha iyi**: 26.5 vs 29.2 sn
+- **p95 kötü uç uyarlanır'ten %9.3 daha iyi**: 26.5 vs 29.2 sn
 - **Acil araç beklemesi %5 daha iyi**: 6.83 vs 7.20 sn
 - **Fairness +%4.5**: 0.891 vs 0.852 (yönler arası daha eşit)
 
-Felsefe: "anlık karar + artan trend bonusu". Adaptif'in toplam refahını
+Felsefe: "anlık karar + artan trend bonusu". Uyarlanır'in toplam refahını
 korur, kötü uç ve adalet boyutlarında küçük ama tutarlı iyileşme sağlar.
 
 ---
@@ -207,7 +207,7 @@ yüksek fairness'a sahip (0.996) çünkü her yöne aynı 30 sn yeşil veriyor
 → tüm yönlerde ortalama bekleme yaklaşık eşit → fairness ~1.
 
 AMA bu "eşitlik" **herkesi eşit ölçüde kötü bekletmek** anlamına geliyor —
-43 saniye ortalama, 101 saniye p95. Adaptif fairness'i (0.852) biraz
+43 saniye ortalama, 101 saniye p95. Uyarlanır fairness'i (0.852) biraz
 daha düşük çünkü kuyruk uzunluğuna duyarlı; bazı yönler avantajlı.
 **Ama 9.7 sn ortalama**. Yani fairness yüksek = performansa kıyasla
 çok kötü değil; fairness ile ortalama bekleme'yi birlikte okumak lazım.
@@ -224,10 +224,10 @@ fuel       = total_idle × 0.000167 L/s    # 0.6 L/saat idle (EPA)
 co2        = fuel × 2310 g/L              # 2.31 kg CO2 / L benzin (EPA)
 ```
 
-Sabit kontrol 4 saatte tahmini 5737 g CO2 üretir, adaptif 1271 g —
+Sabit kontrol 4 saatte tahmini 5737 g CO2 üretir, uyarlanır 1271 g —
 **4 katı fark**. Mutlak sayılar tartışmalı (gerçek araçlar bazen motoru
 kapatır, ortalama yakıt tüketimi araca göre değişir) ama **göreceli
-karşılaştırma sağlam**: sabit kontrolün adaptife göre 4 kat verimsiz
+karşılaştırma sağlam**: sabit kontrolün uyarlanıra göre 4 kat verimsiz
 olduğu kesin. Bu, çevresel argümanın da matematiğini hocaya verir.
 
 ---
@@ -238,7 +238,7 @@ Ortalama yanıltıcı bir özettir — "ortalama 10 sn" demek, "herkes 10 sn
 bekledi" demek değil. Bazen %5 dilim 45 sn bekliyor olabilir. p95 =
 "en kötü %5'lik dilimin bekleme süresi" → gerçek deneyim metriği.
 
-Örnek (adaptif kontrol):
+Örnek (uyarlanır kontrol):
 - p50 (medyan): 6 sn
 - p95: 24 sn
 - p99: 46 sn
@@ -258,7 +258,7 @@ benzetimi). Sonuç:
 | Kontrolcü | Ort. (sn) | p95 (sn) | Notlar |
 |---|---:|---:|---|
 | Sabit Zamanlı | 1138.9 | 3122 | **ciddi performans çöküşü** |
-| Adaptif | 16.84 | 28.1 | trafik akıcı |
+| Uyarlanır | 16.84 | 28.1 | trafik akıcı |
 | Tahmine Dayalı | **16.69** | **27.5** | trend yakaladı, küçük avantaj |
 | Acil Öncelikli | 17.46 | 32.0 | preemption sadece acil için |
 
@@ -269,7 +269,7 @@ tamamlandığında ancak 30 sn boşalma. Sonuç: kuyruk geri yayılıp dağılı
 ortalama bekleme felaket olur. p95 ≈ 52 dakika.
 
 **Hibrit predictive burada ne yapıyor?** Trend bonusu ile Kuzey'in
-dolduğunu erken yakalıyor, daha uzun yeşil veriyor. Adaptifle aynı
+dolduğunu erken yakalıyor, daha uzun yeşil veriyor. Uyarlanırla aynı
 ortalama (16.84 vs 16.69) ama p95 daha düşük (27.5 vs 28.1) ve
 fairness daha yüksek (0.875 vs 0.864).
 
@@ -280,10 +280,10 @@ fairness daha yüksek (0.875 vs 0.864).
 
 | Karşılaştırma | p-value | Sembol | Yorum |
 |---|---:|---|---|
-| Adaptif ≈ Predictive ortalama | 0.97 | ns | trend bonusu ortalamayı kaybetmedi |
-| Predictive p95 < Adaptif | 0.013 | * | kötü uçta anlamlı iyileşme |
-| Predictive fairness > Adaptif | 0.0018 | ** | yön adaletinde çok anlamlı |
-| Sabit ≫ Adaptif ortalama | <0.001 | *** | ana bulgu çok güçlü |
+| Uyarlanır ≈ Predictive ortalama | 0.97 | ns | trend bonusu ortalamayı kaybetmedi |
+| Predictive p95 < Uyarlanır | 0.013 | * | kötü uçta anlamlı iyileşme |
+| Predictive fairness > Uyarlanır | 0.0018 | ** | yön adaletinde çok anlamlı |
+| Sabit ≫ Uyarlanır ortalama | <0.001 | *** | ana bulgu çok güçlü |
 
 Yani hibrit predictive'in p95 ve fairness'taki iyileşmesi rastgele
 seed gürültüsü değil — **istatistiksel olarak anlamlı bir tasarım
@@ -296,7 +296,7 @@ geçiyor. Yani sonuçlar çoklu test düzeltmesine de büyük ölçüde dayanık
 
 ## 21. Saatlik heatmap'te ne görüyoruz?
 
-Yön × Saat matrisi, hücre rengi = ortalama bekleme. Adaptif kontrolde
+Yön × Saat matrisi, hücre rengi = ortalama bekleme. Uyarlanır kontrolde
 4 saatlik koşumda:
 - Kuzey: 3.8 / 7.7 / 2.3 / 1.4 sn → hep en hızlı
 - Güney: 12.3 / 19.1 / 13.5 / 13.7 sn → en yoğun (saat 1'de pik)
