@@ -888,8 +888,8 @@ def build() -> Path:
         slide_10_demo(pdf)
         info = pdf.infodict()
         info["Title"] = "Akıllı Kavşak Trafik Işığı Simülasyonu"
-        info["Author"] = "Nihal Kemer"
-        info["Subject"] = "Benzetim Programlari — Final Odevi"
+        info["Author"] = "Nihal Kemer, Mehmet Furkan Güneş"
+        info["Subject"] = "Benzetim Programları Final Projesi 2026"
     return OUTPUT
 
 
