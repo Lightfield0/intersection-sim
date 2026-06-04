@@ -1,16 +1,16 @@
-"""Etkileşimli Streamlit dashboard — 7 sekme, sade matplotlib.
+"""Etkileşimli Streamlit panel — 7 sekme, sade matplotlib.
 
 Çalıştırma:
     streamlit run dashboard.py
 
 7 sekme:
-    1. Senaryo Çalıştır       — bir kontrolcü için koşum + KPI + grafik
-    2. 4 Kontrolcü Karşılaştır — comparison.csv tablosu + PNG'ler
-    3. Dağılım & Çevresel     — histogram, boxplot, CO2/yakıt
-    4. Saatlik Heatmap        — saat × yön bekleme matrix
-    5. Burst Senaryosu        — ani talep altında 4 kontrolcü
-    6. Sensitivity α Sweep    — predictive α parametre süpürmesi
-    7. Kavşak Görseli         — statik 4-yollu kavşak diyagrami
+    1. Senaryo Çalıştır       — bir yöntemi koştur, sonuçları gör
+    2. Yöntem Karşılaştırma   — 4 yöntemin tablo ve grafiklerle özeti
+    3. Dağılım ve Çevre       — bekleme dağılımı, CO2 / yakıt
+    4. Saatlik Bekleme Isısı  — saat × yön bekleme ısı haritası
+    5. Ani Talep Senaryosu    — ani yığılma altında 4 yöntem
+    6. Trend Katsayısı Denemesi — tahmin yönteminin katsayı testi
+    7. Kavşak Görseli         — kavşağın anlık çizimi
 """
 
 from __future__ import annotations
@@ -60,16 +60,17 @@ st.set_page_config(
 )
 st.title("Kavşak Trafik Işığı Simülasyonu")
 st.caption(
-    "SimPy + 4 yön + 4 kontrolcü (Sabit / Adaptif / Tahmine Dayalı / Acil "
-    "Öncelikli) — final genişletmesi: percentile, fairness, CO2, saatlik heatmap"
+    "Dört yön ve dört farklı ışık kontrol yöntemi "
+    "(Sabit Zamanlı, Uyarlanır, Tahmine Dayalı, Acil Öncelikli) ile "
+    "bekleme süresi, yön adaleti ve CO2 salımı karşılaştırması.",
 )
 
 
-# ---------- Kontrolcü secici ------------------------------------------------
+# ---------- Yöntem seçici ---------------------------------------------------
 
 _CONTROLLERS = {
     "Sabit Zamanlı": ("fixed", fixed_controller),
-    "Adaptif": ("adaptive", adaptive_controller),
+    "Uyarlanır": ("adaptive", adaptive_controller),
     "Tahmine Dayalı": ("predictive", predictive_controller),
     "Acil Öncelikli": ("preemptive", preemptive_controller),
 }
@@ -93,39 +94,42 @@ _DIR_LABELS = {
 # ---------- Sidebar ---------------------------------------------------------
 
 with st.sidebar:
-    st.header("Senaryo")
+    st.header("Senaryo Ayarları")
     controller_label = st.selectbox(
-        "Kontrolcü",
+        "Işık kontrol yöntemi",
         list(_CONTROLLERS.keys()),
-        help="4 kontrolcüden hangisi: Sabit / Adaptif / Tahmine Dayalı / Acil Öncelikli",
+        help="Dört yöntemden hangisini denemek istiyorsunuz?",
     )
-    duration_hours = st.slider("Süre (saat)", 1, 8, 4)
+    duration_hours = st.slider("Koşum süresi (saat)", 1, 8, 4)
     seed = st.number_input(
-        "Seed", min_value=0, max_value=10_000, value=42, step=1,
+        "Rastgelelik tohumu", min_value=0, max_value=10_000, value=42, step=1,
+        help="Aynı tohum, aynı sonucu üretir. Farklı denemeler için "
+             "tohumu değiştirin.",
     )
 
-    with st.expander("Gelişmiş ayarlar", expanded=False):
+    with st.expander("Gelişmiş Ayarlar", expanded=False):
         traffic_profile = st.selectbox(
-            "Trafik profili",
+            "Trafik yoğunluğu",
             list(_TRAFFIC_PROFILES.keys()),
             index=1,
-            help="Tüm yönlerin geliş hızını çarpan ile ölçekler.",
+            help="Tüm yönlerdeki araç geliş hızını arttırır veya azaltır.",
         )
         emergency_pct = st.slider(
             "Acil araç oranı (%)",
             min_value=0, max_value=15, value=5, step=1,
-            help="Gelen araçların kaç %'si acil (ambulans/itfaiye/polis).",
+            help="Gelen araçların yüzde kaçı acil araç olsun?",
         )
 
-        st.markdown("**Burst (ani yığın) olayı**")
+        st.markdown("**Ani Talep Olayı**")
         burst_enabled = st.checkbox(
-            "Burst senaryosunu etkinleştir",
+            "Ani talep yığılması ekle",
             value=False,
-            help="Belirli zamanda + yönde ek talep yığınlaması ekler.",
+            help="Belirli bir saatte bir yöne ek araç yığılması ekler "
+                 "(okul çıkışı, maç sonu gibi).",
         )
         if burst_enabled:
             burst_dir_label = st.selectbox(
-                "Burst yönü", list(_DIR_LABELS.keys()), index=0,
+                "Talep yönü", list(_DIR_LABELS.keys()), index=0,
             )
             burst_start_min = st.slider(
                 "Başlangıç (dakika)", 0, 240, 30, step=5,
@@ -134,8 +138,8 @@ with st.sidebar:
                 "Süre (dakika)", 5, 90, 30, step=5,
             )
             burst_extra_rate = st.slider(
-                "Ek hız (araç/dk)", 5, 40, 20, step=1,
-                help="Base/peak hızının üzerine eklenir.",
+                "Eklenecek hız (araç/dk)", 5, 40, 20, step=1,
+                help="Normal trafik hızının üzerine eklenir.",
             )
 
     st.divider()
@@ -178,14 +182,15 @@ if run_btn:
     if traffic_profile != "Normal (default)":
         extras.append(f"trafik: {traffic_profile}")
     if emergency_pct != 5:
-        extras.append(f"acil: %{emergency_pct}")
+        extras.append(f"acil araç: %{emergency_pct}")
     if burst_enabled:
         extras.append(
-            f"burst: {burst_dir_label} {burst_start_min}-"
-            f"{burst_start_min + burst_duration_min} dk +{burst_extra_rate} araç/dk",
+            f"ani talep: {burst_dir_label} yönüne {burst_start_min}-"
+            f"{burst_start_min + burst_duration_min} dk arası "
+            f"+{burst_extra_rate} araç/dk",
         )
     spin = (f"Koşturuluyor: {controller_label} ({duration_hours} saat, "
-            f"seed={seed})")
+            f"tohum={seed})")
     if extras:
         spin += " · " + " · ".join(extras)
     with st.spinner(spin + " ..."):
@@ -208,11 +213,11 @@ if run_btn:
  tab_sens, tab_diagram) = st.tabs(
     [
         "Senaryo Çalıştır",
-        "4 Kontrolcü Karşılaştırma",
-        "Dağılım & Çevresel",
-        "Saatlik Heatmap",
-        "Burst Senaryosu",
-        "Sensitivity α Sweep",
+        "Yöntem Karşılaştırma",
+        "Dağılım ve Çevre",
+        "Saatlik Bekleme Isısı",
+        "Ani Talep Senaryosu",
+        "Trend Katsayısı Denemesi",
         "Kavşak Görseli",
     ],
 )
@@ -223,7 +228,8 @@ if run_btn:
 with tab_run:
     if "current_run" not in st.session_state:
         st.info(
-            "Sol panelden kontrolcü seç, süre ve seed ayarla, **Çalıştır**'a bas."
+            "Başlamak için sol paneldeki ayarları yapın ve "
+            "**Çalıştır** düğmesine basın.",
         )
     else:
         run = st.session_state["current_run"]
@@ -231,57 +237,72 @@ with tab_run:
         report = run["report"]
 
         st.subheader(
-            f"Senaryo: `{run['controller_label']}` · seed={run['seed']} · "
+            f"Senaryo: `{run['controller_label']}` · tohum={run['seed']} · "
             f"{run['duration_hours']} saat",
         )
         extras = run.get("scenario_extras") or []
         if extras:
             st.caption(" · ".join(extras))
 
-        # 4 KPI metric kart
+        # Üst sıra: temel sonuçlar
         cols = st.columns(4)
         with cols[0]:
             mean_w = report.mean_wait_time_s
-            st.metric("Ortalama bekleme", f"{mean_w:.2f} sn" if mean_w else "n/a")
+            st.metric(
+                "Ortalama bekleme",
+                f"{mean_w:.2f} sn" if mean_w else "-",
+            )
         with cols[1]:
             em_w = report.mean_wait_by_type_s.get("emergency")
-            st.metric("Acil araç beklemesi", f"{em_w:.2f} sn" if em_w else "n/a")
+            st.metric(
+                "Acil araç beklemesi",
+                f"{em_w:.2f} sn" if em_w else "-",
+            )
         with cols[2]:
-            st.metric("Throughput", f"{report.throughput_per_hour:.1f} araç/sa")
+            st.metric(
+                "Saatte geçen araç",
+                f"{report.throughput_per_hour:.1f}",
+            )
         with cols[3]:
-            st.metric("Preemption sayısı", str(report.preemption_count))
+            st.metric(
+                "Acil müdahale sayısı",
+                str(report.preemption_count),
+                help="Acil aracın geçmesi için ışığın erken değiştirildiği "
+                     "durumların sayısı.",
+            )
 
-        # ---- Faz Final: 2. KPI satırı (percentile + fairness + CO2 + idle) ---
+        # Alt sıra: ek sonuçlar
         cols2 = st.columns(4)
         with cols2[0]:
             p95 = report.wait_percentiles_s.get("p95")
             st.metric(
-                "p95 bekleme",
-                f"{p95:.2f} sn" if p95 is not None else "n/a",
-                help="En kötü %5'lik dilimin bekleme süresi — "
-                     "ortalama yanıltıcıdır, p95 'gerçek deneyim'i gösterir.",
+                "En kötü %5 bekleme",
+                f"{p95:.2f} sn" if p95 is not None else "-",
+                help="Sürücülerin yüzde 5'i bu süreyi aşacak şekilde "
+                     "bekliyor. Ortalama yanıltıcı olabilir; bu değer "
+                     "kuyruğun kötü ucunu gösterir.",
             )
         with cols2[1]:
             fi = report.fairness_index
             st.metric(
-                "Fairness (Jain)",
-                f"{fi:.3f}" if fi is not None else "n/a",
-                help="1.0 = yönler arasında mükemmel eşit dağılım; "
-                     "0.25 = tek yön avantajlı (4 yön için min).",
+                "Yön adaleti",
+                f"{fi:.3f}" if fi is not None else "-",
+                help="0 ile 1 arasında. 1'e yakın olması, beklemenin "
+                     "dört yön arasında eşit dağıldığını gösterir.",
             )
         with cols2[2]:
             st.metric(
-                "CO2 (tahmini)",
+                "Tahmini CO2 salımı",
                 f"{report.co2_grams_proxy:.0f} g",
-                help="Idle motorlardan tahmini CO2 emisyonu "
-                     "(0.6 L/saat × 2310 g/L benzin proxy).",
+                help="Beklerken motoru çalışan araçların tahmini CO2 "
+                     "salımı (literatür değerleriyle hesaplanmıştır).",
             )
         with cols2[3]:
             idle_min = report.total_idle_seconds / 60.0
             st.metric(
-                "Toplam idle",
+                "Toplam bekleme süresi",
                 f"{idle_min:.1f} dk",
-                help="Tüm araçların kumulatif bekleme süresi (motor çalışırken).",
+                help="Tüm sürücülerin bekleme sürelerinin toplamı.",
             )
 
         st.divider()
@@ -364,45 +385,48 @@ with tab_run:
 # ===== Tab 2 — 3 Kontrolcü Karşılaştırma ==================================
 
 with tab_compare:
-    st.subheader("4 Kontrolcü Karşılaştırma")
-    st.caption("5 seed × 4 saat ortalaması. Sayılar `results/comparison.csv`'den.")
+    st.subheader("Dört Yöntemin Karşılaştırılması")
+    st.caption(
+        "5 farklı tekrar ile 4'er saatlik koşumların ortalaması.",
+    )
 
     csv_path = Path("results/comparison.csv")
     if not csv_path.exists():
         st.warning(
             "`results/comparison.csv` bulunamadı. Önce şu komutu koşturun:  \n"
-            "`python -m intersection_sim.scenarios.compare --seeds 5 --duration-hours 4`"
+            "`python -m intersection_sim.scenarios.compare --seeds 5 "
+            "--duration-hours 4`",
         )
     else:
         df = pd.read_csv(csv_path)
-        # Sunum için önemli sutunlar (Faz Final genişletilmiş)
         display_cols = [
             "display_name_tr", "mean_wait_s_mean", "p95_wait_s_mean",
             "emergency_wait_s_mean", "throughput_per_hour_mean",
             "fairness_index_mean", "co2_grams_proxy_mean",
             "preemption_count_mean",
         ]
-        # Dosyada eski versiyonlardan kalan kolon eksik olabilir; varsa al
         display_cols = [c for c in display_cols if c in df.columns]
         st.dataframe(
             df[display_cols].rename(columns={
-                "display_name_tr": "Kontrolcü",
-                "mean_wait_s_mean": "Ort. bekleme (sn)",
-                "p95_wait_s_mean": "p95 (sn)",
+                "display_name_tr": "Yöntem",
+                "mean_wait_s_mean": "Ortalama (sn)",
+                "p95_wait_s_mean": "En kötü %5 (sn)",
                 "emergency_wait_s_mean": "Acil araç (sn)",
-                "throughput_per_hour_mean": "Throughput (araç/sa)",
-                "fairness_index_mean": "Fairness",
+                "throughput_per_hour_mean": "Saatlik geçen",
+                "fairness_index_mean": "Yön adaleti",
                 "co2_grams_proxy_mean": "CO2 (g)",
-                "preemption_count_mean": "Preemption",
+                "preemption_count_mean": "Acil müdahale",
             }),
             use_container_width=True, hide_index=True,
         )
 
-        # 3 PNG — tek sutunda alt alta (genis ekran kapasitesini kullan)
         for fname, caption in [
-            ("comparison_avg_wait.png", "Ortalama Bekleme Süresi — 3 Kontrolcü"),
-            ("comparison_emergency_wait.png", "Acil Araç Bekleme Süresi (Ana Sunum Kozu)"),
-            ("comparison_throughput.png", "Throughput — Kontrolcüler Arasında Yakın"),
+            ("comparison_avg_wait.png",
+             "Ortalama bekleme süresi — dört yöntemin karşılaştırması"),
+            ("comparison_emergency_wait.png",
+             "Acil araç bekleme süresi (çalışmanın en güçlü bulgusu)"),
+            ("comparison_throughput.png",
+             "Saatte geçen araç sayısı — yöntemler arasında neredeyse aynı"),
         ]:
             p = Path("results") / fname
             if p.exists():
@@ -420,40 +444,54 @@ with tab_compare:
 # ===== Tab 3 — Dağılım & Çevresel =========================================
 
 with tab_dist:
-    st.subheader("Bekleme Dağılımı ve Çevresel Etki")
+    st.subheader("Bekleme Süresi Dağılımı ve Çevresel Etki")
     if "current_run" not in st.session_state:
         st.info(
-            "Önce Sekme 1'den bir senaryo çalıştırın. Burada o "
-            "koşumdaki bekleme dağılımı + CO2 / yakıt tahmini gösterilir."
+            "Önce sol panelden bir senaryo çalıştırın. Burada bekleme "
+            "süresinin dağılımı ile tahmini CO2 ve yakıt değerleri "
+            "gösterilir.",
         )
     else:
         run = st.session_state["current_run"]
         intersection = run["intersection"]
         report = run["report"]
 
-        # ---- Percentile tablosu --------------------------------------------
-        st.markdown("**Bekleme süresi percentile dilimleri**")
+        # ---- Bekleme süresi dilimleri tablosu -------------------------------
+        st.markdown("**Bekleme süresi dilimleri (saniye)**")
+        st.caption(
+            "Her satırda, ilgili sürücü grubunun ortanca değeri ile "
+            "kötü uçtaki dilimlerinin bekleme süreleri yer alır.",
+        )
         pct_rows = []
-        labels = [("Tümü", report.wait_percentiles_s),
-                  ("Normal", report.wait_percentiles_normal_s),
-                  ("Acil", report.wait_percentiles_emergency_s)]
-        for label, pct_d in labels:
+        labels_grp = [("Tüm sürücüler", report.wait_percentiles_s),
+                      ("Normal araç", report.wait_percentiles_normal_s),
+                      ("Acil araç", report.wait_percentiles_emergency_s)]
+        header_map = {
+            "p50": "Ortanca",
+            "p75": "%75 dilim",
+            "p90": "%90 dilim",
+            "p95": "En kötü %5",
+            "p99": "En kötü %1",
+        }
+        for label, pct_d in labels_grp:
             row = {"Grup": label}
-            for p in ("p50", "p75", "p90", "p95", "p99"):
+            for p, col_name in header_map.items():
                 v = pct_d.get(p)
-                row[p] = f"{v:.2f}" if v is not None else "n/a"
+                row[col_name] = f"{v:.2f}" if v is not None else "-"
             pct_rows.append(row)
         st.dataframe(pd.DataFrame(pct_rows), hide_index=True,
                      use_container_width=True)
 
         st.divider()
 
-        # ---- Histogram + boxplot -------------------------------------------
+        # ---- Histogram + kutu grafiği ---------------------------------------
         dist = prepare_wait_distribution(intersection.metrics)
         if dist["overall"]:
             col_h, col_b = st.columns(2)
             with col_h:
-                st.markdown("**Histogram — tüm araçlar vs acil**")
+                st.markdown(
+                    "**Bekleme süresi dağılımı — normal ve acil ayrımı**",
+                )
                 fig, ax = plt.subplots(figsize=(7, 4))
                 ax.hist(dist["normal"], bins=30, alpha=0.6,
                         color="#3B82F6", label="Normal", edgecolor="white")
@@ -470,7 +508,7 @@ with tab_dist:
                 st.pyplot(fig)
                 plt.close(fig)
             with col_b:
-                st.markdown("**Boxplot — yön bazlı dağılım**")
+                st.markdown("**Yön bazlı bekleme dağılımı (kutu grafiği)**")
                 fig, ax = plt.subplots(figsize=(7, 4))
                 from intersection_sim.domain.direction import (
                     ALL_DIRECTIONS as _AD,
@@ -489,39 +527,49 @@ with tab_dist:
 
         st.divider()
 
-        # ---- Çevresel metrik blok ------------------------------------------
-        st.markdown("**Çevresel etki — idle motor tahmini**")
+        # ---- Çevresel etki blok ---------------------------------------------
+        st.markdown(
+            "**Çevresel etki — beklerken motoru çalışan araçların tahmini "
+            "etkisi**",
+        )
         env_cols = st.columns(4)
         with env_cols[0]:
-            st.metric("Toplam idle",
-                      f"{report.total_idle_seconds/60.0:.1f} dk")
+            st.metric(
+                "Toplam bekleme süresi",
+                f"{report.total_idle_seconds / 60.0:.1f} dk",
+            )
         with env_cols[1]:
-            st.metric("Tahmini yakıt",
+            st.metric("Tahmini yakıt tüketimi",
                       f"{report.fuel_liters_proxy:.3f} L")
         with env_cols[2]:
-            st.metric("Tahmini CO2",
+            st.metric("Tahmini CO2 salımı",
                       f"{report.co2_grams_proxy:.0f} g")
         with env_cols[3]:
-            # CO2 km karşılığı: ortalama otomobil ~120 g/km
             km_eq = report.co2_grams_proxy / 120.0
-            st.metric("Karşılığı (km)",
-                      f"{km_eq:.1f} km",
-                      help="Otomobil 120 g CO2/km ile bu kadar km gidebilir.")
+            st.metric(
+                "Karşılığı (km)",
+                f"{km_eq:.1f} km",
+                help="Ortalama bir otomobil kilometre başına 120 gram "
+                     "CO2 üretir. Bu salım, böyle bir araçla bu kadar "
+                     "kilometre yol gitmenin yarattığı kirliliğe denktir.",
+            )
         st.caption(
-            "Idle yakıt: 0.6 L/saat (literatür). CO2: 2310 g/L benzin "
-            "(EPA). Bu sayılar gerçek ölçüm değil — kontrolcüler arası "
-            "göreceli karşılaştırma için proxy."
+            "Yakıt tüketimi: saatte 0.6 litre (literatür ortalaması). "
+            "CO2: litre başına 2310 gram (EPA verisi). Bu rakamlar "
+            "gerçek ölçüm değil; yöntemler arasındaki farkı görmek için "
+            "kullanılan tahmini değerlerdir.",
         )
 
 
-# ===== Tab 4 — Saatlik Heatmap ============================================
+# ===== Tab 4 — Saatlik bekleme ısı haritası ===============================
 
 with tab_heatmap:
-    st.subheader("Saatlik Bekleme Heatmap'i")
+    st.subheader("Saatlik Bekleme Isı Haritası")
     if "current_run" not in st.session_state:
         st.info(
-            "Önce Sekme 1'den bir senaryo çalıştırın. "
-            "Saatlik × yön bekleme matrisini burada görürsünüz."
+            "Önce sol panelden bir senaryo çalıştırın. Burada her saat "
+            "ve her yön için ortalama bekleme süresinin değiştiğini "
+            "renklerle görebilirsiniz.",
         )
     else:
         run = st.session_state["current_run"]
@@ -547,30 +595,29 @@ with tab_heatmap:
 
             col_heat, col_thru = st.columns([2, 1])
             with col_heat:
-                st.markdown("**Yön × Saat ortalama bekleme (sn)**")
+                st.markdown("**Yön × Saat ortalama bekleme (saniye)**")
                 fig, ax = plt.subplots(figsize=(8, 4))
                 im = ax.imshow(pivot.values, aspect="auto", cmap="YlOrRd")
                 ax.set_yticks(range(len(pivot.index)))
                 ax.set_yticklabels(pivot.index)
                 ax.set_xticks(range(len(pivot.columns)))
                 ax.set_xticklabels([f"Saat {h}" for h in pivot.columns])
-                # Hücre içi değer
                 for i in range(pivot.shape[0]):
                     for j in range(pivot.shape[1]):
                         v = pivot.values[i, j]
                         ax.text(j, i, f"{v:.1f}",
                                 ha="center", va="center",
                                 fontsize=9,
-                                color="white" if v > pivot.values.max()/2
+                                color="white" if v > pivot.values.max() / 2
                                 else "#1F2937")
-                fig.colorbar(im, ax=ax, label="Bekleme (sn)")
-                ax.set_xlabel("Simülasyon saati")
+                fig.colorbar(im, ax=ax, label="Bekleme (saniye)")
+                ax.set_xlabel("Koşum saati")
                 ax.set_ylabel("Yön")
                 fig.tight_layout()
                 st.pyplot(fig)
                 plt.close(fig)
             with col_thru:
-                st.markdown("**Saatlik throughput**")
+                st.markdown("**Saatlik geçen araç sayısı**")
                 fig, ax = plt.subplots(figsize=(5, 4))
                 hours = list(range(len(report.hourly_throughput)))
                 ax.bar(hours, report.hourly_throughput,
@@ -590,20 +637,22 @@ with tab_heatmap:
                 plt.close(fig)
 
             st.caption(
-                "Sıcaklık ne kadar koyu → o saatte o yönde bekleme o "
-                "kadar yüksek. Yoğun saatlerde (07-09 / 17-19) trend "
-                "açıkça artar."
+                "Renk koyulaştıkça o saatte o yönde bekleme süresi "
+                "uzamaktadır. Yoğun saatlerde (07-09 ve 17-19) artış "
+                "açıkça görülür.",
             )
 
 
-# ===== Tab 5 — Burst Senaryosu ============================================
+# ===== Tab 5 — Ani Talep Senaryosu ========================================
 
 with tab_burst:
-    st.subheader("Burst Senaryosu — Ani Talep Altında 4 Kontrolcü")
+    st.subheader("Ani Talep Senaryosu — Dört Yöntemin Karşılaştırması")
     st.caption(
-        "Standart 4 saat koşumun ortasında 30 dk boyunca Kuzey'e +20 araç/dk "
-        "ek yığın (okul çıkışı / maç sonu benzeri). Sabit kontrolün catastrophic "
-        "fail ettiği, predictive'in trend yakalama avantajının ortaya çıktığı yer."
+        "Standart 4 saatlik koşumun ortasında 30 dakika boyunca Kuzey "
+        "yönüne dakikada 20 araç ek talep eklenmektedir (okul çıkışı "
+        "veya maç sonu trafiğine benzer). Sabit zamanlı yöntemin ciddi "
+        "bir performans çöküşü yaşadığı, tahmine dayalı yöntemin ise "
+        "eğilim yakalama üstünlüğünü gösterdiği senaryodur.",
     )
 
     burst_csv = Path("results/comparison_burst.csv")
@@ -623,21 +672,26 @@ with tab_burst:
         display_cols = [c for c in display_cols if c in burst_df.columns]
         st.dataframe(
             burst_df[display_cols].rename(columns={
-                "display_name_tr": "Kontrolcü",
-                "mean_wait_s_mean": "Ort. bekleme (sn)",
-                "p95_wait_s_mean": "p95 (sn)",
-                "emergency_wait_s_mean": "Acil (sn)",
-                "throughput_per_hour_mean": "Throughput (araç/sa)",
-                "fairness_index_mean": "Fairness",
+                "display_name_tr": "Yöntem",
+                "mean_wait_s_mean": "Ortalama (sn)",
+                "p95_wait_s_mean": "En kötü %5 (sn)",
+                "emergency_wait_s_mean": "Acil araç (sn)",
+                "throughput_per_hour_mean": "Saatlik geçen",
+                "fairness_index_mean": "Yön adaleti",
             }),
             use_container_width=True, hide_index=True,
         )
 
         if burst_png.exists():
-            st.image(str(burst_png), use_container_width=True,
-                     caption="Burst senaryosu — log ölçek (fixed ekseni dağıtmasın diye)")
+            st.image(
+                str(burst_png), use_container_width=True,
+                caption=(
+                    "Ani talep senaryosu — sabit yöntemin değeri çok "
+                    "büyük olduğu için grafiklerde logaritmik ölçek "
+                    "kullanılmıştır."
+                ),
+            )
 
-        # Fixed vs adaptive vurgu
         fixed_row = burst_df[burst_df["controller"] == "fixed"]
         adapt_row = burst_df[burst_df["controller"] == "adaptive"]
         if not fixed_row.empty and not adapt_row.empty:
@@ -645,9 +699,10 @@ with tab_burst:
             a_mean = adapt_row["mean_wait_s_mean"].iloc[0]
             ratio = f_mean / a_mean if a_mean > 0 else 0
             st.error(
-                f"**Sabit kontrol burst'te catastrophic fail:** {f_mean:.0f} sn "
-                f"ortalama bekleme (adaptive'in **{ratio:.0f} katı**). "
-                f"Çevrim sırasıyla giden kontrol ani yığını yakalayamaz."
+                f"**Sabit zamanlı yöntem ani talep altında çöktü:** "
+                f"ortalama {f_mean:.0f} saniye bekleme (uyarlanır "
+                f"yöntemin yaklaşık **{ratio:.0f} katı**). Sırayla yeşil "
+                f"veren bu yöntem ani yığılmayı yakalayamamaktadır.",
             )
         pred_row = burst_df[burst_df["controller"] == "predictive"]
         if not pred_row.empty and not adapt_row.empty:
@@ -656,48 +711,58 @@ with tab_burst:
             p_fair = pred_row["fairness_index_mean"].iloc[0]
             a_fair = adapt_row["fairness_index_mean"].iloc[0]
             st.success(
-                f"**Hibrit predictive burst'te trend avantajı:** "
-                f"p95 {p_p95:.1f} sn (adaptive {a_p95:.1f} sn), "
-                f"fairness {p_fair:.3f} vs {a_fair:.3f}."
+                f"**Tahmine dayalı yöntemin eğilim yakalama avantajı:** "
+                f"en kötü %5 dilim {p_p95:.1f} saniye "
+                f"(uyarlanır yöntemde {a_p95:.1f}), "
+                f"yön adaleti {p_fair:.3f} (uyarlanırda {a_fair:.3f}).",
             )
 
 
-# ===== Tab 6 — Sensitivity α Sweep ========================================
+# ===== Tab 6 — Trend Katsayısı Denemesi ===================================
 
 with tab_sens:
-    st.subheader("Sensitivity Analysis — Hibrit Predictive α Sweep")
+    st.subheader("Tahmine Dayalı Yöntem — Trend Katsayısı Denemesi")
     st.caption(
-        "Predictive controller'ın hibrit skor formulü: "
-        "`score = current + α × max(0, predicted − current)`. "
-        "α=0 saf adaptive demektir; α büyüdükçe trend bonusu ağırlık kazanır. "
-        "Buradaki sweep ile α'nın metriklere etkisini gözlemleyebilirsiniz."
+        "Tahmine dayalı yöntem karar verirken anlık kuyruğa bir de "
+        "kuyruktaki artışı ekler. Eklemenin ağırlığını bir katsayı "
+        "(α) belirler: 0 ise yalnızca anlık kuyruk kullanılır "
+        "(uyarlanır yöntemle aynıdır); büyüdükçe eğilim daha çok ağırlık "
+        "kazanır. Buradaki deneme ile farklı katsayıların sonuca etkisini "
+        "görebilirsiniz.",
     )
 
     col1, col2 = st.columns(2)
     with col1:
-        sweep_seeds = st.slider("Seed sayısı", 2, 8, 3, key="sens_seeds",
-                                help="Daha fazla seed = daha sağlam ortalama, daha yavaş")
+        sweep_seeds = st.slider(
+            "Tekrar sayısı", 2, 8, 3, key="sens_seeds",
+            help="Daha fazla tekrar = daha güvenilir ortalama, daha yavaş.",
+        )
     with col2:
-        sweep_hours = st.slider("Süre (saat)", 1, 4, 2, key="sens_hours",
-                                help="Toplam sim süresi her α için")
+        sweep_hours = st.slider(
+            "Koşum süresi (saat)", 1, 4, 2, key="sens_hours",
+            help="Her katsayı için ne kadar uzun koşum yapılacak.",
+        )
 
     alpha_default = "0.0, 0.1, 0.3, 0.5, 0.7, 1.0"
-    alphas_str = st.text_input("α değerleri (virgülle ayırın)",
-                               value=alpha_default,
-                               help="Örn: 0.0, 0.3, 0.7")
+    alphas_str = st.text_input(
+        "Denenecek katsayı (α) değerleri — virgülle ayırın",
+        value=alpha_default,
+        help="Örnek: 0.0, 0.3, 0.7",
+    )
 
-    if st.button("Sweep'i çalıştır", type="primary", key="run_sweep"):
+    if st.button("Denemeyi çalıştır", type="primary", key="run_sweep"):
         try:
-            alphas = [float(s.strip()) for s in alphas_str.split(",") if s.strip()]
+            alphas = [float(s.strip()) for s in alphas_str.split(",")
+                      if s.strip()]
         except ValueError as exc:
-            st.error(f"α parse hatası: {exc}")
+            st.error(f"Katsayı okunamadı: {exc}")
             alphas = []
 
         if alphas:
-            n_runs = len(alphas) + 1  # +1 adaptive baseline
+            n_runs = len(alphas) + 1
             spinner_msg = (
-                f"Sweep çalışıyor: {n_runs} senaryo × {sweep_seeds} seed × "
-                f"{sweep_hours} saat ..."
+                f"Deneme çalışıyor: {n_runs} senaryo × {sweep_seeds} tekrar "
+                f"× {sweep_hours} saat ..."
             )
             with st.spinner(spinner_msg):
                 sweep_df = predictive_alpha_sweep(
@@ -709,40 +774,49 @@ with tab_sens:
 
     if "sweep_df" in st.session_state:
         sweep_df = st.session_state["sweep_df"]
-        st.markdown("**Sweep sonuçları**")
+        st.markdown("**Deneme sonuçları**")
         st.dataframe(
             sweep_df.assign(
                 mean_wait_s=lambda d: d["mean_wait_s"].round(2),
                 p95_wait_s=lambda d: d["p95_wait_s"].round(2),
                 fairness_index=lambda d: d["fairness_index"].round(4),
-            ).drop(columns=["alpha"]),
+            ).drop(columns=["alpha"]).rename(columns={
+                "label": "Yöntem / katsayı",
+                "mean_wait_s": "Ortalama (sn)",
+                "p95_wait_s": "En kötü %5 (sn)",
+                "fairness_index": "Yön adaleti",
+            }),
             use_container_width=True, hide_index=True,
         )
 
-        # 3 yan yana mini-grafik
         plot_cols = st.columns(3)
         non_baseline = sweep_df[sweep_df["alpha"].notna()].copy()
         if not non_baseline.empty:
-            # adaptive baseline'ı yatay çizgi olarak çiz
             adapt = sweep_df[sweep_df["alpha"].isna()].iloc[0]
             metrics_plot = [
-                ("mean_wait_s", "Ortalama bekleme (sn)", "lower is better"),
-                ("p95_wait_s", "p95 bekleme (sn)", "lower is better"),
-                ("fairness_index", "Fairness (Jain)", "higher is better"),
+                ("mean_wait_s", "Ortalama bekleme (sn)", "düşük olması iyi"),
+                ("p95_wait_s", "En kötü %5 bekleme (sn)",
+                 "düşük olması iyi"),
+                ("fairness_index", "Yön adaleti",
+                 "yüksek olması iyi"),
             ]
             for ax_col, (metric_key, title_text, direction) in zip(
                 plot_cols, metrics_plot,
             ):
                 with ax_col:
                     fig, ax = plt.subplots(figsize=(4.5, 3.5))
-                    ax.plot(non_baseline["alpha"], non_baseline[metric_key],
-                            marker="o", color="#7C3AED", linewidth=2,
-                            label="predictive")
+                    ax.plot(
+                        non_baseline["alpha"], non_baseline[metric_key],
+                        marker="o", color="#7C3AED", linewidth=2,
+                        label="Tahmine dayalı",
+                    )
                     if pd.notna(adapt[metric_key]):
-                        ax.axhline(adapt[metric_key],
-                                   linestyle="--", color="#EAB308",
-                                   label="adaptive baseline")
-                    ax.set_xlabel("α (trend bonus ağırlığı)")
+                        ax.axhline(
+                            adapt[metric_key],
+                            linestyle="--", color="#EAB308",
+                            label="Uyarlanır (kıyas)",
+                        )
+                    ax.set_xlabel("Katsayı α (eğilim ağırlığı)")
                     ax.set_ylabel(title_text)
                     ax.set_title(f"{title_text} ({direction})", fontsize=10)
                     ax.legend(fontsize=8)
@@ -754,10 +828,11 @@ with tab_sens:
                     plt.close(fig)
 
         st.info(
-            "**Yorum:** α=0 saf adaptive; α>0 artan trend bonusu. "
-            "Hibrit predictive'in default α=0.3 — bu sweep ile seçildi. "
-            "Çok küçük α (≤0.1) adaptive'le aynıdır; çok büyük α (≥1.5) trend "
-            "tahmini gürültüsü ağır basar."
+            "**Yorum:** α = 0 olduğunda yöntem uyarlanır yöntemle "
+            "aynıdır. α büyüdükçe eğilime daha fazla ağırlık verilir. "
+            "Tahmine dayalı yöntemin varsayılan değeri 0.3'tür; bu, "
+            "çok sayıda deneme sonucu en dengeli sonuç veren değer "
+            "olarak seçilmiştir.",
         )
 
 
@@ -768,8 +843,8 @@ with tab_diagram:
 
     if "current_run" not in st.session_state:
         st.info(
-            "Önce Sekme 1'den bir senaryo çalıştırın. Bu diyagram koşumun"
-            " **son snapshot**'ındaki kavşak durumunu gösterir."
+            "Önce sol panelden bir senaryo çalıştırın. Bu çizim, "
+            "koşumun seçtiğiniz andaki kavşak durumunu gösterir.",
         )
     else:
         run = st.session_state["current_run"]
@@ -777,19 +852,17 @@ with tab_diagram:
         snap_df = intersection.metrics.snapshots_dataframe()
 
         if snap_df.empty:
-            st.warning("Snapshot verisi yok.")
+            st.warning("Görüntülenecek veri bulunamadı.")
         else:
-            # Snapshot zaman secici
             n_snaps = len(snap_df)
-            # Default: son snapshot
             idx = st.slider(
-                "Snapshot zamanı",
+                "Hangi an gösterilsin",
                 0, n_snaps - 1, n_snaps - 1,
-                help="Sim-zamanı üzerinde gez. 0 = başlangıç, son = bitiş.",
+                help="Koşum boyunca gezinin. 0 başlangıç, son ise koşumun "
+                     "bittiği an.",
             )
             row = snap_df.iloc[idx]
 
-            # Kuyruk ve sinyal durumu o snapshot için
             from intersection_sim.domain.direction import Direction as _Dir
             from intersection_sim.domain.signal import (  # noqa: N814
                 LightState as _LS,
@@ -799,15 +872,16 @@ with tab_diagram:
                 d: int(row[f"queue_{d.value}"]) for d in _Dir
             }
 
-            # Snapshot'ta active_green kayitli — diger 3 yön kırmızı
             ag_value = row["active_green"]
             signals = {d: _LS.RED for d in _Dir}
             if pd.notna(ag_value):
                 signals[_Dir(ag_value)] = _LS.GREEN
 
             sim_time_min = row["sim_time_s"] / 60.0
-            title = f"Sim-zaman: {sim_time_min:.1f} dk · " \
-                    f"{run['controller_label']}"
+            title = (
+                f"Koşum süresi: {sim_time_min:.1f} dk · "
+                f"{run['controller_label']}"
+            )
             fig = build_intersection_diagram(
                 signals, queue_lengths, title=title,
             )
@@ -827,8 +901,10 @@ with tab_diagram:
                 if green_dir is not None:
                     st.markdown(f"**Yeşil:** {green_dir.display_name_tr}")
                 else:
-                    st.markdown("Şu an hiçbir yön yeşil değil "
-                                "(sarı veya tüm-kırmızı buffer)")
+                    st.markdown(
+                        "Şu an hiçbir yön yeşil değil "
+                        "(sarı veya güvenlik aralığı).",
+                    )
 
                 st.markdown("**Kuyruk uzunlukları**")
                 for d in _Dir:
@@ -836,6 +912,7 @@ with tab_diagram:
 
                 st.divider()
                 st.caption(
-                    "Bu diyagram bir 'fotoğraf' — slider'ı kaydırarak"
-                    " başka bir sim-zamanındaki kavşak durumunu görebilirsin."
+                    "Bu çizim koşumun belirli bir anının fotoğrafıdır. "
+                    "Yukarıdaki kaydırma çubuğunu kullanarak farklı "
+                    "zamanlardaki kavşak durumunu inceleyebilirsiniz.",
                 )
