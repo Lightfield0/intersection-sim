@@ -62,11 +62,12 @@
 
 ### Percentile — "kötü uç" bakışı
 
-Ortalamalar yanıltıcı. Uyarlanır kontrolde p50 = 6.17 sn (yarısı 6 saniyenin
-altında) ama p95 = 24.21 sn, p99 = 45.74 sn — her 20 sürücüden 1'i 24
-saniye bekliyor. Sunumda "ortalama optimize ettik" yetmez, "kötü uç
-kullanıcıları da düşürdük" demek lazım — p95 uyarlanırte sabit'ten 4 kat
-daha düşük (29 vs 101 sn).
+Ortalamalar yanıltıcı. Uyarlanır kontrolde ortanca = 6.17 sn (yarısı 6
+saniyenin altında) ama en kötü %5 = 24.21 sn, en kötü %1 = 45.74 sn —
+her 20 sürücüden 1'i 24 saniye bekliyor. Sunumda "ortalama optimize
+ettik" yetmez, "kötü uç kullanıcıları da düşürdük" demek lazım — en kötü
+%5 dilimi uyarlanır yöntemde sabit yöntemden yaklaşık 3.5 kat daha
+düşük (29 vs 101 sn).
 
 ### Fairness — "iyi sayı" değil, "doğru yorum lazım"
 
