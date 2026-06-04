@@ -1,42 +1,42 @@
-# Intersection Sim — Akıllı Kavşak Trafik Işığı Simülasyonu
+# Akıllı Kavşak Trafik Işığı Simülasyonu
 
-SimPy ile dört yollu bir kavsagi, **dört farkli trafik ışığı kontrolcüsü**
-ile koşturup karsilastirir: sabit zamanlı, adaptif (kuyruk uzunluğuna
-göre yeşil süresi), **tahmine dayalı** (son 60 sn trendinden 30 sn
-sonrası için tahmin) ve acil öncelikli (ambulans gorulurse mevcut yesili
-kapatip acil yöne öncelik).
+Dört yollu bir kavşağı, **dört farklı trafik ışığı kontrol yöntemiyle**
+benzetir ve karşılaştırır: sabit zamanlı, uyarlanır (kuyruk uzunluğuna
+göre yeşil süresi), **tahmine dayalı** (son bir dakikalık eğilimden
+yakın geleceği tahmin) ve acil öncelikli (ambulans görülürse mevcut
+yeşili kapatıp acil yöne öncelik).
 
-> **Sunum hikayesi**
+> **Özet bulgu**
 >
-> Sabit kontrolde **ambulans 40 saniye bekliyor**. Adaptif kontrol bunu
-> **7 saniyeye** düşürdü. Acil öncelikli kontrol **6 saniyeye** —
-> sabit zamanliya göre **yedi kat fark**. Ayni kavşak, dört farkli mantık,
-> doğru kararı sezgi degil simülasyon verisi gösterdi.
+> Sabit yöntemde **ambulans 40 saniye bekliyor**. Uyarlanır yöntem bunu
+> **7 saniyeye** düşürüyor. Acil öncelikli yöntem **6 saniyeye** —
+> sabit yönteme göre **yedi kat fark**. Aynı kavşak, dört farklı mantık;
+> doğru kararı sezgi değil benzetim verisi gösterdi.
 >
-> **Final genişletmesi:** 4. kontrolcü (hibrit trend-aware tahminci) +
-> 4 yeni metrik ailesi (percentile p50/p75/p90/p95/p99, Jain's fairness,
-> CO2 / yakıt proxy, saatlik heatmap) eklendi. Sabit fair görünüyor
-> (F=0.996) ama herkesi eşit ölçüde bekletmenin **4 katı CO2** maliyeti
-> var. **Hibrit predictive: aynı ortalama, p95 −%9, acil −%5, fairness
-> +%4.5** — trend bonusu ortalamayı kaybettirmeden adalet iyileşiyor.
+> **Final genişletmesi:** 4. yöntem (tahmine dayalı) + dört yeni ölçüt
+> (bekleme dilimleri %50–%99, yön adaleti, CO2 / yakıt tahmini, saatlik
+> bekleme haritası) eklendi. Sabit yöntem adil görünüyor (adalet 0.996)
+> ama herkesi eşit ölçüde bekletmenin **4 katı CO2** maliyeti var.
+> Tahmine dayalı yöntem: aynı ortalama, en kötü %5 −%9, acil −%5,
+> adalet +%4.5 — eğilim bonusu ortalamayı kaybettirmeden adaleti
+> iyileştiriyor.
 
-## Ozellikler
+## Özellikler
 
-- **4 yonlu kavşak modeli** (Kuzey / Güney / Doğu / Batı) ayrı kuyruklarla
-- **4 kontrolcü** — sabit zamanlı, adaptif (queue × 3 sn), **tahmine
-  dayalı** (EWMA trend + 30 sn forecast), acil öncelikli (preemption)
-- **Saatlik değişken trafik** (Poisson, 07-09 + 17-19 yoğun saatler)
-- **Acil araç modeli** (%5 olasılık, özel KPI)
-- **Genişletilmiş metrikler** — percentile (p50-p99), Jain's fairness
-  index, CO2 / yakıt proxy, saatlik heatmap, max kuyruk per yön
-- **Coklu seed runner** — istatistiksel guven için
-- **Streamlit dashboard** — 7 sekme (KPI / karşılaştırma / dağılım /
-  saatlik heatmap / burst / sensitivity α sweep / kavşak görseli)
-- **Burst senaryosu** — ani Kuzey'e yığın talep; sabit kontrol 67×
-  ciddi performans çöküşü eder, predictive trend avantajı görünür
-- **İstatistiksel anlamlılık** — Mann-Whitney U non-parametrik testi:
-  p95 (p=0.013 *), fairness (p=0.0018 **)
-- **92 birim test** — mypy strict, ruff temiz, Mann-Whitney U istatistiksel anlamlılık
+- **4 yönlü kavşak modeli** (Kuzey / Güney / Doğu / Batı) ayrı kuyruklarla
+- **4 yöntem** — sabit zamanlı, uyarlanır, tahmine dayalı, acil öncelikli
+- **Saatlik değişken trafik** (07-09 ve 17-19 yoğun saatler)
+- **Acil araç modeli** (%5 olasılık, ayrı ölçüm)
+- **Genişletilmiş ölçütler** — bekleme dilimleri (%50–%99), yön adaleti,
+  CO2 / yakıt tahmini, saatlik bekleme haritası, yön bazlı en uzun kuyruk
+- **Çoklu tekrar** — istatistiksel güven için
+- **Etkileşimli panel** — 7 sekme (sonuçlar / karşılaştırma / dağılım /
+  saatlik bekleme / ani talep / katsayı denemesi / kavşak görseli)
+- **Ani talep senaryosu** — bir yöne ani yığılma; sabit yöntem 67 kat
+  performans çöküşü yaşar, tahmine dayalı yöntem eğilim avantajı gösterir
+- **İstatistiksel güvenilirlik** — Mann-Whitney U testi:
+  en kötü %5 (p=0.013), yön adaleti (p=0.0018)
+- **92 birim test** — tip denetimi ve biçim denetiminden temiz geçer
 
 ## Mimari
 
@@ -95,40 +95,35 @@ python -m intersection_sim.scenarios.burst --seeds 5 --duration-hours 4
 streamlit run dashboard.py
 ```
 
-## Dashboard — 5 sekme
+## Etkileşimli Panel — 7 sekme
 
-`streamlit run dashboard.py` ile başlar. 5 sekme:
+`streamlit run dashboard.py` ile başlar. 7 sekme:
 
-1. **Senaryo Çalıştır** — sidebar'dan kontrolcü/süre/seed seç,
-   **Çalıştır**. Ana panelde 8 KPI metric karti (2 satır × 4): ortalama
-   bekleme, acil bekleme, throughput, preemption + **p95 bekleme,
-   Fairness (Jain), CO2 tahmini, toplam idle**. Altta: kuyruk uzunluğu
-   zaman serisi, yön bazlı ortalama bekleme bar chart, araç tipi pie.
+1. **Senaryo Çalıştır** — sol panelden yöntem, süre ve tekrar seç,
+   **Çalıştır**. Ana panelde 8 göstergeli kart (2 satır × 4): ortalama
+   bekleme, acil araç beklemesi, saatte geçen araç, acil müdahale sayısı
+   + en kötü %5 bekleme, yön adaleti, tahmini CO2, toplam bekleme süresi.
+   Altta: kuyruk zaman serisi, yön bazlı bekleme grafiği, araç tipi pastası.
 
-2. **4 Kontrolcü Karşılaştırma** — `results/comparison.csv` tablosu,
-   Faz Final ile genişletildi (p95, Fairness, CO2 kolonları). 4 PNG
-   altta: avg_wait, **emergency_wait — altin grafigimiz**, throughput,
-   wait distribution.
+2. **Yöntem Karşılaştırma** — dört yöntemin tablosu ve altta karşılaştırma
+   grafikleri (ortalama bekleme, acil araç, saatte geçen araç).
 
-3. **Dağılım & Çevresel** — Bekleme süresi percentile tablosu (overall
-   / normal / emergency), histogram + boxplot, CO2 / yakıt / idle dakika
-   blokları + "kaç km'ye eşdeğer" karşılığı.
+3. **Dağılım ve Çevre** — bekleme süresi dilimleri tablosu, dağılım ve
+   kutu grafikleri, çevresel etki (yakıt, CO2) blokları + "kaç km'ye
+   eşdeğer" karşılığı.
 
-4. **Saatlik Heatmap** — Yön × Saat ortalama bekleme matrisi
-   (YlOrRd colormap, hücre içi değer), saatlik throughput bar grafik.
-   Yoğun saat (07-09 / 17-19) trendi açıkça görünür.
+4. **Saatlik Bekleme Isısı** — yön × saat ortalama bekleme ısı haritası,
+   yanında saatlik geçen araç sayısı. Yoğun saatlerde artış görünür.
 
-5. **Burst Senaryosu** — comparison_burst.csv tablosu + log-skala bar
-   chart. Sabit kontrolün ciddi performans çöküşü ettiği (67× kötü), hibrit
-   predictive'in trend avantajını gösteren senaryo.
+5. **Ani Talep Senaryosu** — ani yığılma altında dört yöntemin tablosu
+   ve grafiği. Sabit yöntemin 67 kat çöküşü, tahmine dayalı yöntemin
+   eğilim avantajı.
 
-6. **Sensitivity α Sweep** — Hibrit predictive'in α parametre süpürmesi.
-   Adaptive baseline + predictive α∈{0..1} taraması, 3 mini-grafik
-   (mean / p95 / fairness vs α). Parametre seçimi şeffaf.
+6. **Trend Katsayısı Denemesi** — tahmine dayalı yöntemin eğilim
+   katsayısının (0–1 arası) sonuca etkisini gösteren deneme grafikleri.
 
-7. **Kavşak Görseli** — yukaridan goren statik matplotlib diyagrami.
-   Snapshot zaman slider'ı ile zamanın herhangi bir anında kavşağın
-   durumu (yeşil yön + her yöndeki kuyruk uzunluğu).
+7. **Kavşak Görseli** — kavşağın yukarıdan görünümü. Kaydırma çubuğuyla
+   koşumun herhangi bir anındaki durum (yeşil yön + her yöndeki kuyruk).
 
 ## KPI tanimlari
 
