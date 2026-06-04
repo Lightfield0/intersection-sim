@@ -116,7 +116,7 @@ def _save_burst_bar_chart(
         ax1.text(bar.get_x() + bar.get_width() / 2, v + max(means) * 0.02,
                  f"{v:.1f}", ha="center", va="bottom",
                  fontsize=10, fontweight="bold")
-    ax1.set_title("Burst Senaryosu — Ortalama Bekleme", fontsize=12)
+    ax1.set_title("Ani Talep — Ortalama Bekleme", fontsize=12)
     ax1.set_ylabel("Bekleme (sn)")
     ax1.spines["top"].set_visible(False)
     ax1.spines["right"].set_visible(False)
@@ -132,17 +132,17 @@ def _save_burst_bar_chart(
         ax2.text(bar.get_x() + bar.get_width() / 2, v + max(p95s) * 0.02,
                  f"{v:.1f}", ha="center", va="bottom",
                  fontsize=10, fontweight="bold")
-    ax2.set_title("Burst Senaryosu — p95 Bekleme (kötü uç)", fontsize=12)
-    ax2.set_ylabel("p95 bekleme (sn)")
+    ax2.set_title("Ani Talep — En Kötü %5 Bekleme", fontsize=12)
+    ax2.set_ylabel("en kötü %5 bekleme (sn)")
     ax2.spines["top"].set_visible(False)
     ax2.spines["right"].set_visible(False)
     ax2.grid(axis="y", linestyle="--", alpha=0.3)
     if max(p95s) > 10 * min(p95s):
         ax2.set_yscale("log")
-        ax2.set_ylabel("p95 (sn, log)")
+        ax2.set_ylabel("en kötü %5 (sn, log)")
 
     fig.suptitle(
-        "Burst senaryosu: 30 dk Kuzey'e +20 araç/dk ek yığın "
+        "Ani talep: 30 dk boyunca Kuzey'e +20 araç/dk ek yığın "
         "(saat 0.5–1.0)",
         fontsize=11, fontweight="bold", color="#1B4D3E",
     )
